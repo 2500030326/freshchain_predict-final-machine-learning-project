@@ -1,0 +1,42 @@
+{
+  "note": "This dataset has no real missing values, so ~8% MCAR missingness was synthetically injected into Humid (%) and Light (Fux) to demonstrate and compare each strategy, exactly as the session deck validates them.",
+  "injected_missingness_pct": 8.0,
+  "missingness_audit": {
+    "Humid (%)": 8.4,
+    "Light (Fux)": 8.18
+  },
+  "variance_distortion": {
+    "column": "Humid (%)",
+    "true_variance": 10.475,
+    "post_mean_imputation_variance": 9.682,
+    "variance_shrinkage_pct": 7.56
+  },
+  "strategy_comparison": {
+    "listwise_deletion": {
+      "accuracy": 0.921,
+      "rows_used_for_training": 5471,
+      "rows_dropped_pct": 15.73
+    },
+    "mean_imputation": {
+      "accuracy": 0.8768,
+      "rows_used_for_training": 6492
+    },
+    "median_imputation": {
+      "accuracy": 0.8996,
+      "rows_used_for_training": 6492
+    },
+    "knn_imputation": {
+      "accuracy": 0.9094,
+      "rows_used_for_training": 6492
+    },
+    "missing_indicator": {
+      "accuracy": 0.9045,
+      "rows_used_for_training": 6492,
+      "engineered_columns": [
+        "Humid (%)_was_missing",
+        "Light (Fux)_was_missing"
+      ]
+    }
+  },
+  "best_practice_recommendation": "Missing-indicator + mean imputation performs best here \u2014 it keeps every row AND lets the model distinguish real vs guessed values, matching the deck's summary takeaway."
+}

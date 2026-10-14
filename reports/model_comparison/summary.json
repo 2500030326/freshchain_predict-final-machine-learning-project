@@ -1,0 +1,109 @@
+{
+  "comparison_table": [
+    {
+      "Model": "Decision Tree (Entropy)",
+      "Accuracy": 0.9984,
+      "Precision": 0.9981,
+      "Recall": 0.9981,
+      "F1_Score": 0.9981,
+      "Tree_Depth": 11,
+      "Leaf_Count": 37,
+      "OOB_Score": null
+    },
+    {
+      "Model": "Decision Tree (Gini)",
+      "Accuracy": 0.9984,
+      "Precision": 0.9981,
+      "Recall": 0.9981,
+      "F1_Score": 0.9981,
+      "Tree_Depth": 12,
+      "Leaf_Count": 36,
+      "OOB_Score": null
+    },
+    {
+      "Model": "Pre-Pruned Decision Tree",
+      "Accuracy": 0.968,
+      "Precision": 0.941,
+      "Recall": 0.9887,
+      "F1_Score": 0.9643,
+      "Tree_Depth": 5,
+      "Leaf_Count": 12,
+      "OOB_Score": null
+    },
+    {
+      "Model": "Cost-Complexity Pruned Tree",
+      "Accuracy": 0.9984,
+      "Precision": 0.9981,
+      "Recall": 0.9981,
+      "F1_Score": 0.9981,
+      "Tree_Depth": 12,
+      "Leaf_Count": 36,
+      "OOB_Score": null
+    },
+    {
+      "Model": "Random Forest",
+      "Accuracy": 0.9984,
+      "Precision": 0.9981,
+      "Recall": 0.9981,
+      "F1_Score": 0.9981,
+      "Tree_Depth": null,
+      "Leaf_Count": null,
+      "OOB_Score": 0.9977
+    }
+  ],
+  "confusion_matrices": {
+    "Decision Tree (Entropy)": [
+      [
+        685,
+        1
+      ],
+      [
+        1,
+        531
+      ]
+    ],
+    "Decision Tree (Gini)": [
+      [
+        685,
+        1
+      ],
+      [
+        1,
+        531
+      ]
+    ],
+    "Pre-Pruned Decision Tree": [
+      [
+        653,
+        33
+      ],
+      [
+        6,
+        526
+      ]
+    ],
+    "Cost-Complexity Pruned Tree": [
+      [
+        685,
+        1
+      ],
+      [
+        1,
+        531
+      ]
+    ],
+    "Random Forest": [
+      [
+        685,
+        1
+      ],
+      [
+        1,
+        531
+      ]
+    ]
+  },
+  "optimal_ccp_alpha_used": 0.0,
+  "selected_champion": "Random Forest",
+  "rationale": "Random Forest achieves the strongest combination of F1-Score, generalization, and stability. Because cold-storage conditions involve multi-sensor interactions (temperature fluctuations, humidity, and CO2 surges), the bagged ensemble prevents single-tree overfitting and delivers consistent 99%+ accuracy and recall on held-out test data."
+}

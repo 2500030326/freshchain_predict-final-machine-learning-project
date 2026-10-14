@@ -1,0 +1,109 @@
+{
+  "slide24_hand_calculation": {
+    "points_table": [
+      {
+        "Point": "A",
+        "Coordinates": "(1,1)",
+        "Cluster": "C1",
+        "a_i": 1.0,
+        "b_i": 6.03,
+        "s_i": 0.834
+      },
+      {
+        "Point": "B",
+        "Coordinates": "(2,1)",
+        "Cluster": "C1",
+        "a_i": 1.207,
+        "b_i": 5.328,
+        "s_i": 0.773
+      },
+      {
+        "Point": "C",
+        "Coordinates": "(1,2)",
+        "Cluster": "C1",
+        "a_i": 1.207,
+        "b_i": 5.415,
+        "s_i": 0.777
+      },
+      {
+        "Point": "D",
+        "Coordinates": "(5,5)",
+        "Cluster": "C2",
+        "a_i": 1.0,
+        "b_i": 5.219,
+        "s_i": 0.808
+      },
+      {
+        "Point": "E",
+        "Coordinates": "(6,5)",
+        "Cluster": "C2",
+        "a_i": 1.0,
+        "b_i": 5.964,
+        "s_i": 0.832
+      }
+    ],
+    "mean_silhouette_s_bar": 0.805,
+    "interpretation": "s_bar \u2248 0.801 -> Strong cluster structure (within 0.71 \u2013 1.00 range)."
+  },
+  "elbow_and_silhouette_trace": [
+    {
+      "K": 2,
+      "WCSS_Inertia": 77.0,
+      "Marginal_Gain_Reduction": 137.0,
+      "Silhouette_Score": 0.6126
+    },
+    {
+      "K": 3,
+      "WCSS_Inertia": 2.83,
+      "Marginal_Gain_Reduction": 74.17,
+      "Silhouette_Score": 0.869
+    },
+    {
+      "K": 4,
+      "WCSS_Inertia": 2.08,
+      "Marginal_Gain_Reduction": 0.75,
+      "Silhouette_Score": 0.6615
+    },
+    {
+      "K": 5,
+      "WCSS_Inertia": 1.42,
+      "Marginal_Gain_Reduction": 0.67,
+      "Silhouette_Score": 0.3976
+    }
+  ],
+  "comparison_techniques": {
+    "Lloyd's Algorithm": {
+      "Purpose": "Optimise assignments for fixed K",
+      "Metric": "WCSS J",
+      "Cost": "O(nKd)/iter"
+    },
+    "Elbow Method": {
+      "Purpose": "Select optimal K via bend",
+      "Metric": "WCSS vs K curve",
+      "Cost": "Run K_max times"
+    },
+    "Silhouette Score": {
+      "Purpose": "Select K + evaluate quality",
+      "Metric": "s(i) in [-1, +1]",
+      "Cost": "O(n^2)"
+    }
+  },
+  "viva_questions": [
+    {
+      "q": "What does the \u2018K\u2019 in K-Means represent, and who chooses it?",
+      "a": "K represents the predefined number of clusters, chosen by the practitioner before running the algorithm."
+    },
+    {
+      "q": "What happens to WCSS as K approaches n (number of data points)?",
+      "a": "WCSS drops monotonically to 0, because every single point becomes its own centroid."
+    },
+    {
+      "q": "Why does random initialisation sometimes give a worse clustering than k-means++?",
+      "a": "Random initialisation can pick centroids in the same cluster, leading to poor local minima. K-means++ spreads out initial seeds using distance-weighted probability."
+    },
+    {
+      "q": "If a(i) > b(i) for a point, what does that tell you about its cluster assignment?",
+      "a": "s(i) becomes negative, meaning the point is closer to a neighboring cluster than its assigned cluster (likely misclassified)."
+    }
+  ]
+}

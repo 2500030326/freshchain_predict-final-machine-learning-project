@@ -1,0 +1,91 @@
+{
+  "dataset_summary": {
+    "total_samples": 1000,
+    "placed_ratio": 67.0,
+    "not_placed_ratio": 33.0
+  },
+  "fold_allocation_table": [
+    {
+      "fold": 1,
+      "total_val": 200,
+      "placed_count": 134,
+      "not_placed_count": 66,
+      "placed_pct": 67.0,
+      "not_placed_pct": 33.0
+    },
+    {
+      "fold": 2,
+      "total_val": 200,
+      "placed_count": 134,
+      "not_placed_count": 66,
+      "placed_pct": 67.0,
+      "not_placed_pct": 33.0
+    },
+    {
+      "fold": 3,
+      "total_val": 200,
+      "placed_count": 134,
+      "not_placed_count": 66,
+      "placed_pct": 67.0,
+      "not_placed_pct": 33.0
+    },
+    {
+      "fold": 4,
+      "total_val": 200,
+      "placed_count": 134,
+      "not_placed_count": 66,
+      "placed_pct": 67.0,
+      "not_placed_pct": 33.0
+    },
+    {
+      "fold": 5,
+      "total_val": 200,
+      "placed_count": 134,
+      "not_placed_count": 66,
+      "placed_pct": 67.0,
+      "not_placed_pct": 33.0
+    }
+  ],
+  "n_fits_calculation": {
+    "k_outer": 5,
+    "k_inner": 3,
+    "grid_size": 4,
+    "formula": "K_outer * (K_inner * |Lambda| + 1)",
+    "total_fits": 65
+  },
+  "nested_f1_scores": [
+    0.9925,
+    0.9814,
+    0.9963,
+    0.9774,
+    0.9853
+  ],
+  "unbiased_mean_f1": 0.9866,
+  "f1_confidence_margin": 0.0139,
+  "slide_reported_benchmark": {
+    "outer_scores": [
+      0.971,
+      0.932,
+      0.949,
+      0.932,
+      0.931
+    ],
+    "reported_mean_f1": 0.943,
+    "reported_margin": 0.0308,
+    "optimal_c": 1.0
+  },
+  "quiz": [
+    {
+      "q": "What happens if standard K-fold is used on a 99:1 imbalanced dataset?",
+      "a": "Validation folds may contain 0 positive samples, causing Precision/Recall and ROC-AUC evaluation routines to crash or fail."
+    },
+    {
+      "q": "Why is reporting the best inner-loop CV score optimistic?",
+      "a": "Because the hyperparameters were selected specifically to maximize that validation set, resulting in selection bias."
+    },
+    {
+      "q": "How many total model fits occur in Nested CV with K_out=5, K_in=3, and 10 grid options?",
+      "a": "N_fits = 5 * (3 * 10 + 1) = 155 total model fits."
+    }
+  ]
+}

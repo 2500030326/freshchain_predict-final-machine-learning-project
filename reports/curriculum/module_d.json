@@ -1,0 +1,191 @@
+{
+  "dataset": [
+    {
+      "StudentID": "S03",
+      "CGPA": 9.1,
+      "CodingScore": 92,
+      "TrueClass": 1,
+      "PredictedProb": 0.95,
+      "ScoreRank": 1
+    },
+    {
+      "StudentID": "S07",
+      "CGPA": 8.8,
+      "CodingScore": 89,
+      "TrueClass": 1,
+      "PredictedProb": 0.91,
+      "ScoreRank": 2
+    },
+    {
+      "StudentID": "S01",
+      "CGPA": 8.5,
+      "CodingScore": 85,
+      "TrueClass": 1,
+      "PredictedProb": 0.88,
+      "ScoreRank": 3
+    },
+    {
+      "StudentID": "S09",
+      "CGPA": 8.2,
+      "CodingScore": 80,
+      "TrueClass": 1,
+      "PredictedProb": 0.82,
+      "ScoreRank": 4
+    },
+    {
+      "StudentID": "S05",
+      "CGPA": 8.0,
+      "CodingScore": 72,
+      "TrueClass": 1,
+      "PredictedProb": 0.72,
+      "ScoreRank": 5
+    },
+    {
+      "StudentID": "S08",
+      "CGPA": 7.5,
+      "CodingScore": 68,
+      "TrueClass": 0,
+      "PredictedProb": 0.6,
+      "ScoreRank": 6
+    },
+    {
+      "StudentID": "S06",
+      "CGPA": 7.0,
+      "CodingScore": 61,
+      "TrueClass": 0,
+      "PredictedProb": 0.4,
+      "ScoreRank": 7
+    },
+    {
+      "StudentID": "S02",
+      "CGPA": 7.2,
+      "CodingScore": 65,
+      "TrueClass": 0,
+      "PredictedProb": 0.25,
+      "ScoreRank": 8
+    },
+    {
+      "StudentID": "S10",
+      "CGPA": 6.9,
+      "CodingScore": 59,
+      "TrueClass": 0,
+      "PredictedProb": 0.2,
+      "ScoreRank": 9
+    },
+    {
+      "StudentID": "S04",
+      "CGPA": 6.8,
+      "CodingScore": 58,
+      "TrueClass": 0,
+      "PredictedProb": 0.15,
+      "ScoreRank": 10
+    }
+  ],
+  "trajectory_table": [
+    {
+      "threshold": 0.9,
+      "TP": 2,
+      "FP": 0,
+      "TN": 5,
+      "FN": 3,
+      "TPR": 0.4,
+      "FPR": 0.0,
+      "Precision": 1.0,
+      "Accuracy": 0.7,
+      "Youden_J": 0.4,
+      "DistToCorner": 0.6,
+      "ExpectedLoss": 15.0
+    },
+    {
+      "threshold": 0.72,
+      "TP": 5,
+      "FP": 0,
+      "TN": 5,
+      "FN": 0,
+      "TPR": 1.0,
+      "FPR": 0.0,
+      "Precision": 1.0,
+      "Accuracy": 1.0,
+      "Youden_J": 1.0,
+      "DistToCorner": 0.0,
+      "ExpectedLoss": 0.0
+    },
+    {
+      "threshold": 0.5,
+      "TP": 5,
+      "FP": 1,
+      "TN": 4,
+      "FN": 0,
+      "TPR": 1.0,
+      "FPR": 0.2,
+      "Precision": 0.8333,
+      "Accuracy": 0.9,
+      "Youden_J": 0.8,
+      "DistToCorner": 0.2,
+      "ExpectedLoss": 1.0
+    },
+    {
+      "threshold": 0.3,
+      "TP": 5,
+      "FP": 2,
+      "TN": 3,
+      "FN": 0,
+      "TPR": 1.0,
+      "FPR": 0.4,
+      "Precision": 0.7143,
+      "Accuracy": 0.8,
+      "Youden_J": 0.6,
+      "DistToCorner": 0.4,
+      "ExpectedLoss": 2.0
+    }
+  ],
+  "roc_curve_coordinates": [
+    {
+      "FPR": 0.0,
+      "TPR": 0.0,
+      "threshold": Infinity
+    },
+    {
+      "FPR": 0.0,
+      "TPR": 0.2,
+      "threshold": 0.95
+    },
+    {
+      "FPR": 0.0,
+      "TPR": 1.0,
+      "threshold": 0.72
+    },
+    {
+      "FPR": 1.0,
+      "TPR": 1.0,
+      "threshold": 0.15
+    }
+  ],
+  "pairwise_ranking": {
+    "n_pos": 5,
+    "n_neg": 5,
+    "total_pairs": 25,
+    "satisfied_pairs": 25,
+    "auc": 1.0,
+    "explanation": "All 5 positive students have predicted probabilities strictly greater than all 5 negative students! S05 (lowest pos, p=0.72) > S08 (highest neg, p=0.60)."
+  },
+  "optimal_threshold": {
+    "tau_opt": 0.72,
+    "youden_j": 1.0,
+    "policy": "tau* = 0.72 achieves perfect separation (100% precision & recall) on this benchmark."
+  },
+  "quiz": [
+    {
+      "q": "What does a ROC-AUC score of 0.85 mathematically signify?",
+      "a": "85% probability that a randomly chosen positive instance receives a higher score than a random negative instance."
+    },
+    {
+      "q": "How does raising the decision threshold tau affect Precision and Recall?",
+      "a": "Precision increases (fewer FP), while Recall decreases (more FN)."
+    },
+    {
+      "q": "What point on the ROC curve maximizes Youden's J-Statistic?",
+      "a": "The threshold tau* that maximizes vertical distance J = TPR - FPR above the diagonal."
+    }
+  ]
+}

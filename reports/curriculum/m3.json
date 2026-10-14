@@ -1,0 +1,151 @@
+{
+  "module_id": "M3",
+  "title": "Supervised Learning \u2014 Tree-Based Models",
+  "splitting_criteria": {
+    "parent_gini": 0.48,
+    "parent_entropy": 0.971,
+    "left_entropy": 0.65,
+    "right_entropy": 0.8113,
+    "information_gain": 0.2564,
+    "parent_samples": 10,
+    "left_samples": 6,
+    "right_samples": 4
+  },
+  "ccp_pruning": {
+    "optimal_alpha": 0.001039,
+    "best_val_accuracy": 0.7578,
+    "unpruned_depth": 19,
+    "unpruned_nodes": 911,
+    "alpha_path_sample": [
+      {
+        "alpha": 0.0,
+        "val_accuracy": 0.6956,
+        "depth": 19,
+        "node_count": 911
+      },
+      {
+        "alpha": 0.000397,
+        "val_accuracy": 0.6956,
+        "depth": 19,
+        "node_count": 789
+      },
+      {
+        "alpha": 0.000433,
+        "val_accuracy": 0.6978,
+        "depth": 17,
+        "node_count": 701
+      },
+      {
+        "alpha": 0.000463,
+        "val_accuracy": 0.6956,
+        "depth": 17,
+        "node_count": 619
+      },
+      {
+        "alpha": 0.000567,
+        "val_accuracy": 0.7,
+        "depth": 17,
+        "node_count": 507
+      },
+      {
+        "alpha": 0.000643,
+        "val_accuracy": 0.7,
+        "depth": 17,
+        "node_count": 435
+      },
+      {
+        "alpha": 0.000732,
+        "val_accuracy": 0.7267,
+        "depth": 13,
+        "node_count": 315
+      },
+      {
+        "alpha": 0.000847,
+        "val_accuracy": 0.7444,
+        "depth": 12,
+        "node_count": 233
+      },
+      {
+        "alpha": 0.001039,
+        "val_accuracy": 0.7578,
+        "depth": 12,
+        "node_count": 157
+      },
+      {
+        "alpha": 0.001635,
+        "val_accuracy": 0.7578,
+        "depth": 8,
+        "node_count": 65
+      },
+      {
+        "alpha": 0.006441,
+        "val_accuracy": 0.7467,
+        "depth": 4,
+        "node_count": 17
+      }
+    ]
+  },
+  "random_forest": {
+    "oob_score": 0.7614,
+    "test_accuracy": 0.7911,
+    "n_estimators": 100,
+    "max_features": "sqrt",
+    "unique_in_bag_pct": 63.48,
+    "oob_pct": 36.52
+  },
+  "benchmark_comparison": {
+    "linear_baseline": {
+      "name": "Logistic Regression (Linear Baseline)",
+      "roc_auc": 0.8738,
+      "f1_score": 0.8162,
+      "accuracy": 0.7978
+    },
+    "gradient_boosted_tree": {
+      "name": "Histogram GBDT (LightGBM/XGBoost style)",
+      "roc_auc": 0.878,
+      "f1_score": 0.8057,
+      "accuracy": 0.7867
+    },
+    "relative_auc_improvement_pct": 0.48
+  },
+  "feature_importance_triad": [
+    {
+      "feature": "cgpa",
+      "permutation_mean": 0.1627,
+      "permutation_std": 0.0375,
+      "rf_mdi": 0.4543
+    },
+    {
+      "feature": "internships",
+      "permutation_mean": 0.0707,
+      "permutation_std": 0.012,
+      "rf_mdi": 0.0915
+    },
+    {
+      "feature": "backlogs",
+      "permutation_mean": 0.0636,
+      "permutation_std": 0.0159,
+      "rf_mdi": 0.0719
+    },
+    {
+      "feature": "projects",
+      "permutation_mean": 0.0231,
+      "permutation_std": 0.0106,
+      "rf_mdi": 0.1047
+    },
+    {
+      "feature": "iq",
+      "permutation_mean": 0.0169,
+      "permutation_std": 0.0161,
+      "rf_mdi": 0.2776
+    }
+  ],
+  "kaggle_tabular_reality": {
+    "why_trees_beat_nns": [
+      "Invariance to monotonic transforms: Trees ignore scale, skewness, and non-Gaussian tails.",
+      "Axis-aligned splits match tabular domain semantics (e.g., thresholding CGPA or CO2 concentrations).",
+      "Built-in resistance to uninformative/redundant features via greedy feature selection.",
+      "Superior sample efficiency on mid-sized datasets without massive hyperparameter tuning."
+    ]
+  }
+}

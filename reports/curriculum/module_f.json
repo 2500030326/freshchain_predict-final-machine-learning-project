@@ -1,0 +1,163 @@
+{
+  "calibration_table": [
+    {
+      "Student": "S1",
+      "CGPA": 6.2,
+      "Aptitude": 55,
+      "ActualY": 0,
+      "RawP": 0.1,
+      "PlattP": 0.043,
+      "IsotonicP": 0.0
+    },
+    {
+      "Student": "S2",
+      "CGPA": 6.5,
+      "Aptitude": 60,
+      "ActualY": 0,
+      "RawP": 0.2,
+      "PlattP": 0.159,
+      "IsotonicP": 0.0
+    },
+    {
+      "Student": "S3",
+      "CGPA": 7.0,
+      "Aptitude": 65,
+      "ActualY": 1,
+      "RawP": 0.3,
+      "PlattP": 0.329,
+      "IsotonicP": 0.5
+    },
+    {
+      "Student": "S4",
+      "CGPA": 7.1,
+      "Aptitude": 70,
+      "ActualY": 0,
+      "RawP": 0.35,
+      "PlattP": 0.423,
+      "IsotonicP": 0.5
+    },
+    {
+      "Student": "S5",
+      "CGPA": 7.5,
+      "Aptitude": 72,
+      "ActualY": 1,
+      "RawP": 0.45,
+      "PlattP": 0.607,
+      "IsotonicP": 0.5
+    },
+    {
+      "Student": "S6",
+      "CGPA": 7.8,
+      "Aptitude": 75,
+      "ActualY": 0,
+      "RawP": 0.55,
+      "PlattP": 0.759,
+      "IsotonicP": 0.5
+    },
+    {
+      "Student": "S7",
+      "CGPA": 8.0,
+      "Aptitude": 80,
+      "ActualY": 1,
+      "RawP": 0.6,
+      "PlattP": 0.819,
+      "IsotonicP": 1.0
+    },
+    {
+      "Student": "S8",
+      "CGPA": 8.3,
+      "Aptitude": 85,
+      "ActualY": 1,
+      "RawP": 0.7,
+      "PlattP": 0.908,
+      "IsotonicP": 1.0
+    },
+    {
+      "Student": "S9",
+      "CGPA": 8.7,
+      "Aptitude": 90,
+      "ActualY": 1,
+      "RawP": 0.8,
+      "PlattP": 0.963,
+      "IsotonicP": 1.0
+    },
+    {
+      "Student": "S10",
+      "CGPA": 9.0,
+      "Aptitude": 95,
+      "ActualY": 1,
+      "RawP": 0.9,
+      "PlattP": 0.991,
+      "IsotonicP": 1.0
+    }
+  ],
+  "s7_walkthrough": {
+    "student": "S7",
+    "p_raw": 0.6,
+    "log_odds_f": 0.4055,
+    "a": 1.773,
+    "b": 0.789,
+    "calculated_p_cal": 0.819,
+    "slide_reported_p_cal": 0.819
+  },
+  "brier_comparison_10_students": {
+    "raw_brier": 0.157,
+    "platt_brier": 0.143,
+    "isotonic_brier": 0.1,
+    "slide_reported": {
+      "raw": 0.157,
+      "platt": 0.143,
+      "isotonic": 0.1
+    }
+  },
+  "exercise_5_students": {
+    "predicted_p": [
+      0.8,
+      0.2,
+      0.6,
+      0.4,
+      0.7
+    ],
+    "actual_y": [
+      1,
+      0,
+      1,
+      0,
+      1
+    ],
+    "sq_errors": [
+      0.04,
+      0.04,
+      0.16,
+      0.16,
+      0.09
+    ],
+    "sum_sq_error": 0.49,
+    "brier_score": 0.098
+  },
+  "alternative_convention": {
+    "A": 0.8,
+    "B": -0.2,
+    "logit": 1.0,
+    "calibrated_prob": 0.6457
+  },
+  "overconfidence_demo": {
+    "five_students_pred": 0.8,
+    "actual_placed": "3 out of 5 (60%)",
+    "diagnosis": "Model over-confident by 20%. Calibration maps 0.80 -> 0.60."
+  },
+  "quiz": [
+    {
+      "q": "What calibrator is best for N = 400 validation samples?",
+      "a": "Platt Scaling (Sigmoid) because 2 parameters prevent overfitting."
+    },
+    {
+      "q": "How does PAVA maintain monotonicity in Isotonic Regression?",
+      "a": "It sorts scores and pools adjacent violators by taking their weighted average whenever an inversion (higher score mapping to lower outcome) occurs."
+    },
+    {
+      "q": "What is the Brier Score of a constant 0.50 baseline on a 50/50 dataset?",
+      "a": "BS = 0.25 (since (0.5 - 1)^2 = (0.5 - 0)^2 = 0.25). Any model worse than 0.25 is worse than a coin flip!"
+    }
+  ]
+}

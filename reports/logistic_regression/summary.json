@@ -1,0 +1,123 @@
+{
+  "model_name": "Logistic Regression Classifier",
+  "sample_counts": {
+    "training_samples": 5680,
+    "validation_samples": 1217,
+    "test_samples": 1218
+  },
+  "intercept_beta_0": -0.7133,
+  "coefficients_and_odds_ratios": [
+    {
+      "Feature": "Light (Fux)",
+      "Coefficient_Beta": 12.408,
+      "Odds_Ratio_exp_Beta": 244761.3185,
+      "Impact_Interpretation": "Multiplies odds of spoilage by 244761.32x per 1 std dev increase"
+    },
+    {
+      "Feature": "Humid (%)",
+      "Coefficient_Beta": 5.0469,
+      "Odds_Ratio_exp_Beta": 155.5431,
+      "Impact_Interpretation": "Multiplies odds of spoilage by 155.54x per 1 std dev increase"
+    },
+    {
+      "Feature": "Fruit_Orange",
+      "Coefficient_Beta": 2.3647,
+      "Odds_Ratio_exp_Beta": 10.6413,
+      "Impact_Interpretation": "Multiplies odds of spoilage by 10.64x per 1 std dev increase"
+    },
+    {
+      "Feature": "Temp",
+      "Coefficient_Beta": 1.5241,
+      "Odds_Ratio_exp_Beta": 4.5909,
+      "Impact_Interpretation": "Multiplies odds of spoilage by 4.59x per 1 std dev increase"
+    },
+    {
+      "Feature": "Fruit_Tomato",
+      "Coefficient_Beta": 1.4055,
+      "Odds_Ratio_exp_Beta": 4.0776,
+      "Impact_Interpretation": "Multiplies odds of spoilage by 4.08x per 1 std dev increase"
+    },
+    {
+      "Feature": "Fruit_Pineapple",
+      "Coefficient_Beta": 1.0947,
+      "Odds_Ratio_exp_Beta": 2.9882,
+      "Impact_Interpretation": "Multiplies odds of spoilage by 2.99x per 1 std dev increase"
+    },
+    {
+      "Feature": "CO2 (pmm)",
+      "Coefficient_Beta": 0.0687,
+      "Odds_Ratio_exp_Beta": 1.0712,
+      "Impact_Interpretation": "Multiplies odds of spoilage by 1.07x per 1 std dev increase"
+    }
+  ],
+  "metrics_at_threshold_0_5": {
+    "accuracy": 0.9122,
+    "precision": 0.8608,
+    "recall": 0.953,
+    "f1_score": 0.9045,
+    "roc_auc": 0.9551,
+    "log_loss": 0.2607,
+    "confusion_matrix": [
+      [
+        604,
+        82
+      ],
+      [
+        25,
+        507
+      ]
+    ]
+  },
+  "threshold_sensitivity": [
+    {
+      "Threshold": 0.2,
+      "Accuracy": 0.8793,
+      "Precision": 0.7843,
+      "Recall": 0.9981,
+      "F1_Score": 0.8784
+    },
+    {
+      "Threshold": 0.3,
+      "Accuracy": 0.9007,
+      "Precision": 0.8176,
+      "Recall": 0.9944,
+      "F1_Score": 0.8974
+    },
+    {
+      "Threshold": 0.4,
+      "Accuracy": 0.9113,
+      "Precision": 0.8522,
+      "Recall": 0.9643,
+      "F1_Score": 0.9048
+    },
+    {
+      "Threshold": 0.5,
+      "Accuracy": 0.9122,
+      "Precision": 0.8608,
+      "Recall": 0.953,
+      "F1_Score": 0.9045
+    },
+    {
+      "Threshold": 0.6,
+      "Accuracy": 0.908,
+      "Precision": 0.8659,
+      "Recall": 0.9342,
+      "F1_Score": 0.8987
+    },
+    {
+      "Threshold": 0.7,
+      "Accuracy": 0.8892,
+      "Precision": 0.9179,
+      "Recall": 0.8195,
+      "F1_Score": 0.8659
+    },
+    {
+      "Threshold": 0.8,
+      "Accuracy": 0.7791,
+      "Precision": 0.9097,
+      "Recall": 0.5489,
+      "F1_Score": 0.6846
+    }
+  ],
+  "viva_takeaway": "Logistic Regression performs binary classification by wrapping a linear combination of features in the Sigmoid activation function \u03c3(z) = 1 / (1 + e\u207b\u1dbb). It outputs calibrated probabilities between 0 and 1. The model achieves an ROC-AUC of 95.51% and an F1-Score of 90.45%. Unlike Linear Regression which uses MSE, Logistic Regression is optimized using Maximum Likelihood Estimation via Log Loss."
+}

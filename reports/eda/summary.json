@@ -1,0 +1,210 @@
+{
+  "structure": {
+    "shape": {
+      "rows": 10995,
+      "columns": 6
+    },
+    "column_names": [
+      "Fruit",
+      "Temp",
+      "Humid (%)",
+      "Light (Fux)",
+      "CO2 (pmm)",
+      "Class"
+    ],
+    "dtypes": {
+      "Fruit": "str",
+      "Temp": "int64",
+      "Humid (%)": "int64",
+      "Light (Fux)": "float64",
+      "CO2 (pmm)": "int64",
+      "Class": "str"
+    },
+    "head": [
+      {
+        "Fruit": "Orange",
+        "Temp": 22,
+        "Humid (%)": 95,
+        "Light (Fux)": 7.358649263,
+        "CO2 (pmm)": 361,
+        "Class": "Good"
+      },
+      {
+        "Fruit": "Orange",
+        "Temp": 24,
+        "Humid (%)": 95,
+        "Light (Fux)": 14.83589827,
+        "CO2 (pmm)": 370,
+        "Class": "Bad"
+      },
+      {
+        "Fruit": "Pineapple",
+        "Temp": 25,
+        "Humid (%)": 95,
+        "Light (Fux)": 10.10404473,
+        "CO2 (pmm)": 355,
+        "Class": "Bad"
+      },
+      {
+        "Fruit": "Banana",
+        "Temp": 25,
+        "Humid (%)": 89,
+        "Light (Fux)": 20.17964285,
+        "CO2 (pmm)": 388,
+        "Class": "Good"
+      },
+      {
+        "Fruit": "Tomato",
+        "Temp": 23,
+        "Humid (%)": 90,
+        "Light (Fux)": 12.62144823,
+        "CO2 (pmm)": 316,
+        "Class": "Good"
+      }
+    ],
+    "tail": [
+      {
+        "Fruit": "Tomato",
+        "Temp": 25,
+        "Humid (%)": 95,
+        "Light (Fux)": 104.2175196,
+        "CO2 (pmm)": 321,
+        "Class": "Bad"
+      },
+      {
+        "Fruit": "Tomato",
+        "Temp": 25,
+        "Humid (%)": 95,
+        "Light (Fux)": 103.427398,
+        "CO2 (pmm)": 314,
+        "Class": "Bad"
+      },
+      {
+        "Fruit": "Tomato",
+        "Temp": 26,
+        "Humid (%)": 95,
+        "Light (Fux)": 103.427398,
+        "CO2 (pmm)": 324,
+        "Class": "Bad"
+      },
+      {
+        "Fruit": "Tomato",
+        "Temp": 25,
+        "Humid (%)": 95,
+        "Light (Fux)": 103.427398,
+        "CO2 (pmm)": 316,
+        "Class": "Bad"
+      },
+      {
+        "Fruit": "Tomato",
+        "Temp": 25,
+        "Humid (%)": 95,
+        "Light (Fux)": 103.427398,
+        "CO2 (pmm)": 313,
+        "Class": "Bad"
+      }
+    ],
+    "describe": {
+      "Temp": {
+        "count": 10995.0,
+        "mean": 23.839,
+        "std": 1.235,
+        "min": 21.0,
+        "25%": 23.0,
+        "50%": 24.0,
+        "75%": 25.0,
+        "max": 27.0
+      },
+      "Humid (%)": {
+        "count": 10995.0,
+        "mean": 93.526,
+        "std": 3.001,
+        "min": 71.0,
+        "25%": 94.0,
+        "50%": 95.0,
+        "75%": 95.0,
+        "max": 95.0
+      },
+      "Light (Fux)": {
+        "count": 10995.0,
+        "mean": 24.933,
+        "std": 48.023,
+        "min": 4.221,
+        "25%": 9.929,
+        "50%": 12.908,
+        "75%": 15.592,
+        "max": 268.448
+      },
+      "CO2 (pmm)": {
+        "count": 10995.0,
+        "mean": 319.53,
+        "std": 58.889,
+        "min": 20.0,
+        "25%": 289.0,
+        "50%": 323.0,
+        "75%": 359.0,
+        "max": 478.0
+      }
+    }
+  },
+  "data_quality": {
+    "missing_values": {
+      "Fruit": {
+        "count": 0,
+        "pct": 0.0
+      },
+      "Temp": {
+        "count": 0,
+        "pct": 0.0
+      },
+      "Humid (%)": {
+        "count": 0,
+        "pct": 0.0
+      },
+      "Light (Fux)": {
+        "count": 0,
+        "pct": 0.0
+      },
+      "CO2 (pmm)": {
+        "count": 0,
+        "pct": 0.0
+      },
+      "Class": {
+        "count": 0,
+        "pct": 0.0
+      }
+    },
+    "duplicate_rows": 2880,
+    "duplicate_pct": 26.19
+  },
+  "target_distribution": {
+    "Good": 5667,
+    "Bad": 5328
+  },
+  "correlation": {
+    "Temp": {
+      "Temp": 1.0,
+      "Humid (%)": -0.033,
+      "Light (Fux)": 0.37,
+      "CO2 (pmm)": 0.192
+    },
+    "Humid (%)": {
+      "Temp": -0.033,
+      "Humid (%)": 1.0,
+      "Light (Fux)": 0.124,
+      "CO2 (pmm)": -0.201
+    },
+    "Light (Fux)": {
+      "Temp": 0.37,
+      "Humid (%)": 0.124,
+      "Light (Fux)": 1.0,
+      "CO2 (pmm)": -0.094
+    },
+    "CO2 (pmm)": {
+      "Temp": 0.192,
+      "Humid (%)": -0.201,
+      "Light (Fux)": -0.094,
+      "CO2 (pmm)": 1.0
+    }
+  }
+}

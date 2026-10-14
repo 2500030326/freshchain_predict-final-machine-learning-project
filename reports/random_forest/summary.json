@@ -1,0 +1,169 @@
+{
+  "bootstrap_sampling": {
+    "total_training_samples": 5680,
+    "bootstrap_sample_size": 5680,
+    "unique_samples_selected": 3509,
+    "duplicate_instances_count": 2171,
+    "omitted_oob_instances_count": 2171,
+    "percentage_selected": 61.78,
+    "percentage_oob": 38.22,
+    "theoretical_expectation": {
+      "in_bag_percentage": "~63.21%",
+      "out_of_bag_percentage": "~36.79%",
+      "formula": "lim (n->inf) [1 - (1 - 1/n)^n] = 1 - 1/e"
+    },
+    "explanation": "From the 5680 training records, sampling with replacement picked 3509 unique samples (61.78%) and duplicated some observations 2171 times. Exactly 2171 records (38.22%) were omitted from this particular tree's training, becoming its Out-of-Bag (OOB) evaluation set. This closely matches the theoretical 63.2% / 36.8% rule."
+  },
+  "random_feature_selection": {
+    "max_features_strategy": "sqrt",
+    "features_considered_per_split": 3,
+    "total_available_features": 8,
+    "explanation": "At each decision node, only a random subset of features (sqrt(8) = 3 features) is evaluated. This breaks correlation between trees: even if 'Humid (%)' is the globally strongest predictor, other trees are forced to discover secondary signals (e.g. CO2, Light, Temperature), creating an ensemble of diverse expert trees."
+  },
+  "majority_voting_demonstration": [
+    {
+      "test_sample_index": 727,
+      "true_label": "Spoiled (Bad)",
+      "total_trees": 100,
+      "votes_for_spoiled": 100,
+      "votes_for_fresh": 0,
+      "spoiled_vote_pct": 100.0,
+      "final_ensemble_prediction": "Spoiled (Bad)",
+      "consensus": "Unanimous"
+    },
+    {
+      "test_sample_index": 6887,
+      "true_label": "Spoiled (Bad)",
+      "total_trees": 100,
+      "votes_for_spoiled": 93,
+      "votes_for_fresh": 7,
+      "spoiled_vote_pct": 93.0,
+      "final_ensemble_prediction": "Spoiled (Bad)",
+      "consensus": "Majority"
+    },
+    {
+      "test_sample_index": 4846,
+      "true_label": "Fresh (Good)",
+      "total_trees": 100,
+      "votes_for_spoiled": 0,
+      "votes_for_fresh": 100,
+      "spoiled_vote_pct": 0.0,
+      "final_ensemble_prediction": "Fresh (Good)",
+      "consensus": "Unanimous"
+    },
+    {
+      "test_sample_index": 1262,
+      "true_label": "Spoiled (Bad)",
+      "total_trees": 100,
+      "votes_for_spoiled": 100,
+      "votes_for_fresh": 0,
+      "spoiled_vote_pct": 100.0,
+      "final_ensemble_prediction": "Spoiled (Bad)",
+      "consensus": "Unanimous"
+    },
+    {
+      "test_sample_index": 7141,
+      "true_label": "Fresh (Good)",
+      "total_trees": 100,
+      "votes_for_spoiled": 0,
+      "votes_for_fresh": 100,
+      "spoiled_vote_pct": 0.0,
+      "final_ensemble_prediction": "Fresh (Good)",
+      "consensus": "Unanimous"
+    }
+  ],
+  "out_of_bag_evaluation": {
+    "oob_score": 0.9982,
+    "val_accuracy": 0.9975,
+    "test_accuracy": 0.9984,
+    "train_accuracy": 0.9989,
+    "oob_vs_test_gap": 0.0001,
+    "explanation": "Out-of-Bag (OOB) evaluation uses each sample only on the trees where it was omitted during bootstrap. Because the OOB score (approx. 99.82%) aligns closely with the held-out test accuracy (99.84%), it serves as an internal cross-validation estimate with zero data leakage."
+  },
+  "hyperparameter_sensitivity": [
+    {
+      "n_estimators": 10,
+      "train_accuracy": 0.9998,
+      "val_accuracy": 0.9992,
+      "test_accuracy": 0.9984,
+      "oob_score": 0.9903
+    },
+    {
+      "n_estimators": 25,
+      "train_accuracy": 0.9998,
+      "val_accuracy": 0.9975,
+      "test_accuracy": 0.9984,
+      "oob_score": 0.9977
+    },
+    {
+      "n_estimators": 50,
+      "train_accuracy": 1.0,
+      "val_accuracy": 0.9975,
+      "test_accuracy": 0.9984,
+      "oob_score": 0.9977
+    },
+    {
+      "n_estimators": 100,
+      "train_accuracy": 1.0,
+      "val_accuracy": 0.9975,
+      "test_accuracy": 0.9984,
+      "oob_score": 0.9977
+    },
+    {
+      "n_estimators": 150,
+      "train_accuracy": 1.0,
+      "val_accuracy": 0.9975,
+      "test_accuracy": 0.9984,
+      "oob_score": 0.9981
+    },
+    {
+      "n_estimators": 200,
+      "train_accuracy": 1.0,
+      "val_accuracy": 0.9975,
+      "test_accuracy": 0.9984,
+      "oob_score": 0.9982
+    }
+  ],
+  "feature_importance": [
+    {
+      "Feature": "Light (Fux)",
+      "Random_Forest_Importance": 0.3454,
+      "Decision_Tree_Importance": 0.3248
+    },
+    {
+      "Feature": "Humid (%)",
+      "Random_Forest_Importance": 0.2412,
+      "Decision_Tree_Importance": 0.3302
+    },
+    {
+      "Feature": "Temp",
+      "Random_Forest_Importance": 0.2085,
+      "Decision_Tree_Importance": 0.1801
+    },
+    {
+      "Feature": "CO2 (pmm)",
+      "Random_Forest_Importance": 0.0981,
+      "Decision_Tree_Importance": 0.1009
+    },
+    {
+      "Feature": "Fruit_Orange",
+      "Random_Forest_Importance": 0.0305,
+      "Decision_Tree_Importance": 0.0
+    },
+    {
+      "Feature": "Fruit_Banana",
+      "Random_Forest_Importance": 0.0291,
+      "Decision_Tree_Importance": 0.0146
+    },
+    {
+      "Feature": "Fruit_Tomato",
+      "Random_Forest_Importance": 0.026,
+      "Decision_Tree_Importance": 0.0056
+    },
+    {
+      "Feature": "Fruit_Pineapple",
+      "Random_Forest_Importance": 0.0212,
+      "Decision_Tree_Importance": 0.0438
+    }
+  ]
+}

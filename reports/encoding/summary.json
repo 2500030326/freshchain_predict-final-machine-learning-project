@@ -1,0 +1,133 @@
+{
+  "one_hot": {
+    "sample_table": [
+      {
+        "Fruit": "Orange",
+        "Fruit_Banana": 0.0,
+        "Fruit_Orange": 1.0,
+        "Fruit_Pineapple": 0.0,
+        "Fruit_Tomato": 0.0
+      },
+      {
+        "Fruit": "Orange",
+        "Fruit_Banana": 0.0,
+        "Fruit_Orange": 1.0,
+        "Fruit_Pineapple": 0.0,
+        "Fruit_Tomato": 0.0
+      },
+      {
+        "Fruit": "Pineapple",
+        "Fruit_Banana": 0.0,
+        "Fruit_Orange": 0.0,
+        "Fruit_Pineapple": 1.0,
+        "Fruit_Tomato": 0.0
+      },
+      {
+        "Fruit": "Banana",
+        "Fruit_Banana": 1.0,
+        "Fruit_Orange": 0.0,
+        "Fruit_Pineapple": 0.0,
+        "Fruit_Tomato": 0.0
+      },
+      {
+        "Fruit": "Tomato",
+        "Fruit_Banana": 0.0,
+        "Fruit_Orange": 0.0,
+        "Fruit_Pineapple": 0.0,
+        "Fruit_Tomato": 1.0
+      },
+      {
+        "Fruit": "Orange",
+        "Fruit_Banana": 0.0,
+        "Fruit_Orange": 1.0,
+        "Fruit_Pineapple": 0.0,
+        "Fruit_Tomato": 0.0
+      }
+    ],
+    "output_width": 4
+  },
+  "ordinal_pitfall": {
+    "warning": "Fruit has no true order \u2014 this encoding is shown as the PITFALL, not a recommendation.",
+    "arbitrary_order_used": [
+      "Banana",
+      "Orange",
+      "Pineapple",
+      "Tomato"
+    ],
+    "sample": [
+      {
+        "Fruit": "Orange",
+        "ordinal_code": 1
+      },
+      {
+        "Fruit": "Orange",
+        "ordinal_code": 1
+      },
+      {
+        "Fruit": "Pineapple",
+        "ordinal_code": 2
+      },
+      {
+        "Fruit": "Banana",
+        "ordinal_code": 0
+      },
+      {
+        "Fruit": "Tomato",
+        "ordinal_code": 3
+      },
+      {
+        "Fruit": "Orange",
+        "ordinal_code": 1
+      }
+    ]
+  },
+  "target_encoding": {
+    "global_good_rate": 0.563,
+    "naive_means_per_fruit": {
+      "Banana": 0.6609,
+      "Orange": 0.5369,
+      "Pineapple": 0.5101,
+      "Tomato": 0.5715
+    },
+    "leak_free_kfold_smoothed_sample": [
+      0.5389,
+      0.5415,
+      0.5121,
+      0.6592,
+      0.5673,
+      0.5337
+    ],
+    "note": "Naive means are computed on the full dataset and leak the label; the K-fold + smoothing version is what the final pipeline would use in production."
+  },
+  "embedding_preview": {
+    "status": "preview only \u2014 not trained in this project",
+    "idea": "Replace each Fruit category with a small learned dense vector (e.g. 2-4 dimensions), trained jointly with a neural network instead of computed by hand. Useful at much higher cardinality than this dataset's 4 fruit categories."
+  },
+  "encoder_comparison": {
+    "One-Hot": {
+      "output_width": "1 col/category",
+      "needs_label": "No",
+      "handles_high_cardinality": "Poorly",
+      "leakage_risk": "None"
+    },
+    "Ordinal": {
+      "output_width": "1 column",
+      "needs_label": "No",
+      "handles_high_cardinality": "Well",
+      "leakage_risk": "None"
+    },
+    "Target": {
+      "output_width": "1 column",
+      "needs_label": "Yes",
+      "handles_high_cardinality": "Well",
+      "leakage_risk": "High if done naively; low with K-fold + smoothing"
+    },
+    "Embedding": {
+      "output_width": "k dims (learned)",
+      "needs_label": "Yes (trained jointly)",
+      "handles_high_cardinality": "Best",
+      "leakage_risk": "None"
+    }
+  },
+  "chosen_encoder_for_production_pipeline": "One-Hot \u2014 Fruit is nominal with only 4 categories, comfortably low cardinality, exactly the 'good fit' case from the deck."
+}

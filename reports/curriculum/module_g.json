@@ -1,0 +1,121 @@
+{
+  "practice_problem_solution": {
+    "grid_configurations": 12,
+    "grid_model_fits": 60,
+    "random_60_p_miss": 0.0461,
+    "random_60_p_hit": 0.9539,
+    "samples_for_95_pct_confidence": 59,
+    "formula_derivation": "n >= ln(0.05) / ln(0.95) = -2.9957 / -0.05129 = 58.40 => 59 samples"
+  },
+  "bayesian_optimization_gp": {
+    "sampled_depths": [
+      3,
+      5,
+      10,
+      15,
+      20
+    ],
+    "validation_scores": [
+      0.72,
+      0.85,
+      0.94,
+      0.91,
+      0.88
+    ],
+    "f_best": 0.94,
+    "next_recommended_depth_to_evaluate": 25,
+    "gp_predictions_table": [
+      {
+        "depth": 1,
+        "predicted_mean_acc": 0.5566,
+        "uncertainty_sigma": 0.0241,
+        "expected_improvement": 0.0
+      },
+      {
+        "depth": 2,
+        "predicted_mean_acc": 0.6406,
+        "uncertainty_sigma": 0.0089,
+        "expected_improvement": 0.0
+      },
+      {
+        "depth": 3,
+        "predicted_mean_acc": 0.72,
+        "uncertainty_sigma": 0.0,
+        "expected_improvement": 0.0
+      },
+      {
+        "depth": 4,
+        "predicted_mean_acc": 0.7911,
+        "uncertainty_sigma": 0.0026,
+        "expected_improvement": 0.0
+      },
+      {
+        "depth": 5,
+        "predicted_mean_acc": 0.85,
+        "uncertainty_sigma": 0.0,
+        "expected_improvement": 0.0
+      },
+      {
+        "depth": 6,
+        "predicted_mean_acc": 0.8938,
+        "uncertainty_sigma": 0.0048,
+        "expected_improvement": 0.0
+      },
+      {
+        "depth": 7,
+        "predicted_mean_acc": 0.9223,
+        "uncertainty_sigma": 0.0084,
+        "expected_improvement": 5e-05
+      },
+      {
+        "depth": 8,
+        "predicted_mean_acc": 0.9373,
+        "uncertainty_sigma": 0.0089,
+        "expected_improvement": 0.00238
+      },
+      {
+        "depth": 9,
+        "predicted_mean_acc": 0.942,
+        "uncertainty_sigma": 0.0058,
+        "expected_improvement": 0.00344
+      },
+      {
+        "depth": 10,
+        "predicted_mean_acc": 0.94,
+        "uncertainty_sigma": 0.0,
+        "expected_improvement": 0.0
+      }
+    ]
+  },
+  "comparison_matrix": {
+    "Grid Search": {
+      "Budget": "Exhaustive Lattice",
+      "Dimension Scaling": "Poor O(k^d)",
+      "Pros": "Guaranteed coverage on small grids"
+    },
+    "Random Search": {
+      "Budget": "User fixed n_iter",
+      "Dimension Scaling": "High (Bergstra-Bengio)",
+      "Pros": "Tests more unique values per parameter"
+    },
+    "Bayesian Optimization": {
+      "Budget": "Sequential GP / TPE",
+      "Dimension Scaling": "Sample efficient",
+      "Pros": "Balances exploration and exploitation"
+    }
+  },
+  "quiz": [
+    {
+      "q": "What is the main advantage of Random Search over Grid Search?",
+      "a": "Bergstra-Bengio Theorem proves Random Search tests more unique values along important dimensions for the same compute budget."
+    },
+    {
+      "q": "How does the Expected Improvement (EI) formula balance exploration vs exploitation?",
+      "a": "The (mu - f_best)*Phi(Z) term rewards high predicted scores (exploitation), while sigma*phi(Z) rewards high uncertainty (exploration)."
+    },
+    {
+      "q": "How many samples give at least 95% confidence of landing in top 5%?",
+      "a": "n >= ln(0.05)/ln(0.95) = 58.4 -> Exactly 59 samples."
+    }
+  ]
+}

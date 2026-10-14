@@ -1,0 +1,2579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FreshPredict — Produce Quality Intelligence</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #f4f6fb; --sidebar-bg: #0d1730; --sidebar-text: #b9c2dc; --card-bg: #ffffff;
+    --text-dark: #12172b; --text-muted: #6b7488; --accent-teal: #17a888; --accent-purple: #7c6ff0;
+    --accent-orange: #f2a950; --accent-red: #ef6f6c; --border: #e7eaf3;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text-dark); display: flex; min-height: 100vh; }
+  .sidebar {
+    width: 255px;
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 14px;
+    flex-shrink: 0;
+    height: 100vh;
+    overflow-y: auto;
+    position: sticky;
+    top: 0;
+    scrollbar-width: thin;
+    scrollbar-color: #273659 transparent;
+  }
+  .sidebar::-webkit-scrollbar { width: 5px; }
+  .sidebar::-webkit-scrollbar-thumb { background: #273659; border-radius: 4px; }
+  .nav-icon { font-size: 15px; width: 22px; display: inline-flex; align-items: center; justify-content: center; margin-right: 4px; }
+  .brand { display: flex; align-items: center; gap: 10px; padding: 0 8px 20px 8px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 8px; }
+  .brand-icon { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, var(--accent-teal), var(--accent-purple)); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .brand-title { font-weight: 700; color: #fff; font-size: 15px; }
+  .brand-sub { font-size: 10px; letter-spacing: 0.08em; color: #7d87a6; }
+  .nav-section-label { font-size: 10px; letter-spacing: 0.1em; color: #5c6689; margin: 16px 8px 6px; text-transform: uppercase; font-weight: 700; }
+  .nav-item { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; color: var(--sidebar-text); margin-bottom: 2px; transition: background 0.15s ease, color 0.15s ease; }
+  .nav-item:hover { background: #16213f; color: #fff; }
+  .nav-item.active { background: #133a33; color: #fff; font-weight: 600; }
+  .main { flex: 1; padding: 28px 36px; overflow-y: auto; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+  .topbar-title { font-size: 13px; color: var(--text-muted); display:flex; align-items:center; gap:8px;}
+  .status-pill { background: #e9fbf6; color: var(--accent-teal); padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .status-pill.bad { background: #fdeeee; color: var(--accent-red); }
+  .status-pill.live { background: #fff3e0; color: var(--accent-orange); }
+  .hero { background: radial-gradient(circle at top right, #16264d, #0d1730); border-radius: 18px; padding: 32px; color: #fff; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+  .hero h1 { margin: 6px 0 8px; font-size: 26px; }
+  .hero p { color: #a9b3d1; margin: 0; max-width: 520px; font-size: 14px; }
+  .hero-eyebrow { font-size: 11px; letter-spacing: 0.12em; color: var(--accent-teal); text-transform: uppercase; font-weight: 700;}
+  .hero-badge { background: rgba(255,255,255,0.08); border-radius: 12px; padding: 16px 20px; font-size: 12px; color: #cfd6ec; }
+  section { display: none; }
+  section.active { display: block; }
+  h2.section-title { font-size: 18px; margin: 0 0 4px; }
+  p.section-sub { color: var(--text-muted); font-size: 13px; margin: 0 0 18px; }
+  .grid { display: grid; gap: 16px; }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+  .stat-label { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
+  .stat-value { font-size: 26px; font-weight: 700; margin: 6px 0 4px; }
+  .stat-value small { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+  .stat-foot { font-size: 12px; color: var(--text-muted); }
+  .bar-track { height: 5px; background: #eef0f8; border-radius: 4px; margin-top: 10px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; }
+  .chart-card h3 { margin: 0 0 2px; font-size: 15px; }
+  .chart-card p { margin: 0 0 14px; font-size: 12px; color: var(--text-muted); }
+  canvas { max-height: 240px; }
+  form#predictForm { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+  .field select, .field input { padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); font-size: 14px; background: #fbfcfe; }
+  .predict-btn { grid-column: span 2; margin-top: 6px; background: var(--accent-teal); color: #fff; border: none; padding: 13px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .predict-btn:disabled { opacity: 0.6; }
+  .result-card { margin-top: 18px; padding: 20px; border-radius: 14px; display: none; }
+  .result-card.good { background: #e9fbf6; border: 1px solid #b8ecdd; }
+  .result-card.bad { background: #fdeeee; border: 1px solid #f6c9c8; }
+  .result-title { font-size: 22px; font-weight: 800; margin: 0 0 4px; }
+  .result-card.good .result-title { color: #0d7a5f; }
+  .result-card.bad .result-title { color: #c14442; }
+  .result-sub { font-size: 13px; color: var(--text-muted); }
+  .prob-bar { height: 8px; border-radius: 6px; background: #e4e8f2; margin-top: 12px; overflow: hidden; }
+  .prob-fill { height: 100%; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--border); }
+  th { color: var(--text-muted); font-weight: 600; font-size: 11px; text-transform: uppercase; }
+  .pill { padding: 3px 9px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .pill.good { background: #e9fbf6; color: var(--accent-teal); }
+  .pill.bad { background: #fdeeee; color: var(--accent-red); }
+  .metric-row { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .metric-row:last-child { border-bottom: none; }
+  .metric-row span:last-child { font-weight: 700; }
+  .loading { color: var(--text-muted); font-size: 13px; padding: 20px; }
+  code { background: #f1f3f9; padding: 1px 6px; border-radius: 4px; font-size: 12px; }
+  .pulse { display:inline-block; width:7px; height:7px; border-radius:50%; background: var(--accent-teal); margin-right:6px; animation: pulse 1.4s infinite; }
+  @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+  .warn-box { background: #fff8ec; border: 1px solid #f3dfae; border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #7a5a12; margin-bottom: 16px; }
+
+  /* Code Box Component */
+  .code-box { background: #0d1730; border: 1px solid #1f2d52; border-radius: 8px; margin-top: 14px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  .code-box-header { display: flex; justify-content: space-between; align-items: center; background: #152244; padding: 7px 14px; font-size: 11px; color: #8da2d4; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 1px solid #1f2d52; }
+  .code-box pre { margin: 0; padding: 12px 14px; font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 12px; color: #93c5fd; overflow-x: auto; line-height: 1.5; }
+  .copy-code-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 2px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; transition: all 0.2s; font-family: sans-serif; }
+  .copy-code-btn:hover { background: var(--accent-teal); border-color: var(--accent-teal); color: #fff; }
+
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="brand">
+    <div class="brand-icon">🍊</div>
+    <div><div class="brand-title">FreshChain</div><div class="brand-sub">COLD-STORAGE IOT AI</div></div>
+  </div>
+
+  <div class="nav-section-label">Workspace</div>
+  <div class="nav-item active" data-target="overview"><span class="nav-icon">📊</span>Overview</div>
+  <div class="nav-item" data-target="dataset"><span class="nav-icon">📁</span>Dataset</div>
+  <div class="nav-item" data-target="eda"><span class="nav-icon">🔍</span>EDA Analytics</div>
+
+  <div class="nav-section-label">Feature Engineering</div>
+  <div class="nav-item" data-target="scaling"><span class="nav-icon">⚖️</span>Feature Scaling</div>
+  <div class="nav-item" data-target="encoding"><span class="nav-icon">🏷️</span>Categorical Encoding</div>
+  <div class="nav-item" data-target="missing"><span class="nav-icon">🧩</span>Missing Values</div>
+
+  <div class="nav-section-label">M5 Sessions · Evaluation & Optimization</div>
+  <div class="nav-item" data-target="module_a"><span class="nav-icon">🔒</span>M5-1: Split & Data Leakage</div>
+  <div class="nav-item" data-target="module_b"><span class="nav-icon">🔁</span>M5-2: Stratified & Nested CV</div>
+  <div class="nav-item" data-target="module_c"><span class="nav-icon">📏</span>M5-3: Metrics & Huber Loss</div>
+  <div class="nav-item" data-target="module_d"><span class="nav-icon">🎯</span>M5-4: ROC-AUC & Youden's J</div>
+  <div class="nav-item" data-target="module_e"><span class="nav-icon">📉</span>M5-5: PR Curves & Imbalance</div>
+  <div class="nav-item" data-target="module_f"><span class="nav-icon">🎲</span>M5-6: Calibration & Brier Score</div>
+  <div class="nav-item" data-target="module_g"><span class="nav-icon">🔍</span>M5-7: Hyperparameter Search</div>
+  <div class="nav-item" data-target="m5_curriculum"><span class="nav-icon">📊</span>M5: Full Evaluation Overview</div>
+
+  <div class="nav-section-label">M4 Sessions · Unsupervised Learning</div>
+  <div class="nav-item" data-target="module_i"><span class="nav-icon">📍</span>M4-1: K-Means & Lloyd's Alg</div>
+  <div class="nav-item" data-target="module_j"><span class="nav-icon">🌲</span>M4-2: Hierarchical Clustering</div>
+  <div class="nav-item" data-target="module_h"><span class="nav-icon">🏠</span>M4-3: Cluster Regression</div>
+  <div class="nav-item" data-target="m4_curriculum"><span class="nav-icon">🔮</span>M4: Full Clustering Overview</div>
+
+  <div class="nav-section-label">Tree Models & Engineering</div>
+  <div class="nav-item" data-target="m3_curriculum"><span class="nav-icon">🌳</span>M3: Trees, GBDT & SHAP</div>
+  <div class="nav-item" data-target="decision_tree"><span class="nav-icon">🌿</span>Decision Tree & Pruning</div>
+  <div class="nav-item" data-target="random_forest"><span class="nav-icon">🌲</span>Random Forest & OOB</div>
+  <div class="nav-item" data-target="model_comparison"><span class="nav-icon">🏆</span>Model Comparison</div>
+  <div class="nav-item" data-target="m6_curriculum"><span class="nav-icon">🚀</span>M6: Production, Skew & Drift</div>
+
+  <div class="nav-section-label">Machine Learning</div>
+  <div class="nav-item" data-target="predict"><span class="nav-icon">🔮</span>Predict Spoilage</div>
+  <div class="nav-item" data-target="model"><span class="nav-icon">ℹ️</span>Model Registry</div>
+  <div class="nav-item" data-target="live"><span class="nav-icon">⚡</span>Live Monitoring Feed</div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">🍊 Produce Quality Analytics <span id="apiStatus" class="status-pill">checking…</span></div>
+    <div class="topbar-title" id="modelPill"></div>
+  </div>
+
+  <div class="hero">
+    <div>
+      <div class="hero-eyebrow">Storage Quality Intelligence</div>
+      <h1>Good day 👋</h1>
+      <p>Data loading → EDA → feature scaling → encoding → missing-value handling → a live, served model.</p>
+    </div>
+    <div class="hero-badge" id="heroBadge">Loading model info…</div>
+  </div>
+
+  <!-- OVERVIEW -->
+  <section id="overview" class="active">
+    <h2 class="section-title">Dataset snapshot</h2>
+    <p class="section-sub">At-a-glance stats, refreshed automatically every few seconds.</p>
+    <div class="grid grid-4" id="statCards"><div class="loading">Loading stats…</div></div>
+    <div class="grid grid-2" style="margin-top: 24px;">
+      <div class="card chart-card"><h3>Class distribution</h3><p>Good vs Bad storage outcomes</p><canvas id="classChart"></canvas></div>
+      <div class="card chart-card"><h3>Fruit distribution</h3><p>Record count per fruit type</p><canvas id="fruitChart"></canvas></div>
+    </div>
+  </section>
+
+  <!-- DATASET -->
+  <section id="dataset">
+    <h2 class="section-title">Dataset preview</h2>
+    <p class="section-sub">First rows of the cleaned training dataset.</p>
+    <div class="card" style="overflow-x:auto;"><table id="datasetTable"><tbody><tr><td class="loading">Loading…</td></tr></tbody></table></div>
+  </section>
+
+  <!-- EDA -->
+  <section id="eda">
+    <h2 class="section-title">Exploratory Data Analysis <span style="font-size:12px; color:var(--text-muted); font-weight:400;">— Session 5-8</span></h2>
+    <p class="section-sub">Data loading, structure, quality checks, univariate / bivariate / multivariate analysis.</p>
+    <div class="grid grid-3" id="edaStatCards" style="margin-bottom:20px;"><div class="loading">Loading…</div></div>
+    <div class="grid grid-2">
+      <div class="card chart-card"><h3>Target distribution</h3><img id="imgTarget" style="width:100%; border-radius:8px;" /></div>
+      <div class="card chart-card"><h3>Correlation matrix (multivariate)</h3><img id="imgCorr" style="width:100%; border-radius:8px;" /></div>
+    </div>
+    <div class="card chart-card" style="margin-top:16px;"><h3>Univariate — histograms</h3><img id="imgHist" style="width:100%; border-radius:8px;" /></div>
+    <div class="card chart-card" style="margin-top:16px;"><h3>Univariate — box plots (outliers)</h3><img id="imgBox" style="width:100%; border-radius:8px;" /></div>
+    <div class="card chart-card" style="margin-top:16px;"><h3>Univariate — Fruit count plot</h3><img id="imgCount" style="width:100%; border-radius:8px; max-width:500px;" /></div>
+    <div class="card chart-card" style="margin-top:16px;"><h3>Bivariate — numeric features vs Class</h3><img id="imgBiNum" style="width:100%; border-radius:8px;" /></div>
+    <div class="card chart-card" style="margin-top:16px;"><h3>Bivariate — Fruit vs Class</h3><img id="imgBiCat" style="width:100%; border-radius:8px; max-width:600px;" /></div>
+    <div class="card chart-card" style="margin-top:16px;"><h3>Multivariate — pairwise scatter matrix</h3><img id="imgPair" style="width:100%; border-radius:8px;" /></div>
+  </section>
+
+  <!-- SCALING -->
+  <section id="scaling">
+    <h2 class="section-title">Feature Scaling & Standardization <span style="font-size:12px; color:var(--text-muted); font-weight:400;">— Session 9-10</span></h2>
+    <p class="section-sub">Min-Max, Standard, and Robust scaling compared, plus a KNN accuracy experiment.</p>
+    <div class="grid grid-2">
+      <div class="card">
+        <h3 style="margin-top:0;">Before / after — one sample row</h3>
+        <div id="scalingSample"><div class="loading">Loading…</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">Does scaling change results? (KNN, k=7)</h3>
+        <div id="scalingExperiment"><div class="loading">Loading…</div></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px;">
+      <h3 style="margin-top:0;">Scaler comparison</h3>
+      <div id="scalerComparisonTable"><div class="loading">Loading…</div></div>
+    </div>
+  </section>
+
+  <!-- ENCODING -->
+  <section id="encoding">
+    <h2 class="section-title">Encoding Categorical Features <span style="font-size:12px; color:var(--text-muted); font-weight:400;">— Session 11-12</span></h2>
+    <p class="section-sub">One-Hot, Ordinal (pitfall demo), Target (K-fold, leak-free), and Embedding preview — all on "Fruit".</p>
+    <div class="grid grid-2">
+      <div class="card">
+        <h3 style="margin-top:0;">One-Hot Encoding</h3>
+        <div id="oneHotTable"><div class="loading">Loading…</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">Ordinal Encoding — the pitfall</h3>
+        <div id="ordinalWarning"></div>
+        <div id="ordinalTable"><div class="loading">Loading…</div></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px;">
+      <h3 style="margin-top:0;">Target Encoding (leak-free, K-fold + smoothing)</h3>
+      <div id="targetEncoding"><div class="loading">Loading…</div></div>
+    </div>
+    <div class="card" style="margin-top:16px;">
+      <h3 style="margin-top:0;">Encoder comparison</h3>
+      <div id="encoderComparisonTable"><div class="loading">Loading…</div></div>
+    </div>
+  </section>
+
+  <!-- MISSING VALUES -->
+  <section id="missing">
+    <h2 class="section-title">Handling Missing Values <span style="font-size:12px; color:var(--text-muted); font-weight:400;">— Session 13-14</span></h2>
+    <div class="warn-box" id="missingNote">This dataset has no real missing values — see note below once loaded.</div>
+    <div class="card">
+      <h3 style="margin-top:0;">Strategy comparison (same LogisticRegression, same split)</h3>
+      <div id="missingStrategyTable"><div class="loading">Loading…</div></div>
+    </div>
+    <div class="grid grid-2" style="margin-top:16px;">
+      <div class="card"><h3 style="margin-top:0;">Variance distortion from mean imputation</h3><div id="varianceDistortion"><div class="loading">Loading…</div></div></div>
+      <div class="card"><h3 style="margin-top:0;">Best practice recommendation</h3><p id="bestPractice" style="font-size:13px; color:var(--text-muted); line-height:1.6;"></p></div>
+    </div>
+  </section>
+
+  <!-- PREDICT -->
+  <section id="predict">
+    <h2 class="section-title">Predict storage quality</h2>
+    <p class="section-sub">Live inference from the trained champion model.</p>
+    <div class="grid grid-2">
+      <div class="card">
+        <form id="predictForm">
+          <div class="field"><label>Fruit</label>
+            <select name="Fruit" required>
+              <option value="Orange">Orange</option><option value="Pineapple">Pineapple</option>
+              <option value="Banana">Banana</option><option value="Tomato">Tomato</option>
+            </select>
+          </div>
+          <div class="field"><label>Temperature (°C)</label><input type="number" step="0.1" name="Temp" value="22" required></div>
+          <div class="field"><label>Humidity (%)</label><input type="number" step="0.1" name="Humid" value="95" required></div>
+          <div class="field"><label>Light (lux)</label><input type="number" step="0.01" name="Light" value="7.36" required></div>
+          <div class="field"><label>CO2 (ppm)</label><input type="number" step="0.1" name="CO2" value="361" required></div>
+          <button type="submit" class="predict-btn" id="predictBtn">Run prediction</button>
+        </form>
+        <div class="result-card" id="resultCard">
+          <div class="result-title" id="resultTitle"></div>
+          <div class="result-sub" id="resultSub"></div>
+          <div class="prob-bar"><div class="prob-fill" id="probFill"></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">How this works</h3>
+        <p style="font-size:13px; color:var(--text-muted); line-height:1.6;">
+          Inputs are sent to <code>POST /api/predict</code>, passed through the same fitted
+          One-Hot + StandardScaler transform used at training time, then scored by the
+          champion model. Every prediction also appears on the <b>Live Feed</b> tab in real time.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODEL INFO -->
+  <section id="model">
+    <h2 class="section-title">Champion model</h2>
+    <p class="section-sub">Test-set metrics for every candidate model trained.</p>
+    <div id="allModelMetrics" class="grid grid-2"><div class="loading">Loading…</div></div>
+  </section>
+
+  <!-- LIVE FEED -->
+  <section id="live">
+    <h2 class="section-title"><span class="pulse"></span>Live prediction feed</h2>
+    <p class="section-sub">Updates automatically every 2 seconds. Make a few predictions on the Predict tab to populate this.</p>
+    <div class="grid grid-3" style="margin-bottom:16px;">
+      <div class="card"><div class="stat-label">Predictions logged</div><div class="stat-value" id="liveTotal">0</div></div>
+      <div class="card"><div class="stat-label">Live Good rate</div><div class="stat-value" id="liveGoodRate">—</div></div>
+      <div class="card"><div class="stat-label">Auto-refresh</div><div class="stat-value" style="font-size:16px;"><span class="pulse"></span>Every 2s</div></div>
+    </div>
+    <div class="card" style="overflow-x:auto;">
+      <table id="liveTable"><thead><tr><th>Time</th><th>Fruit</th><th>Temp</th><th>Humid</th><th>Prediction</th><th>Confidence</th></tr></thead>
+      <tbody><tr><td class="loading" colspan="6">No predictions yet — try the Predict tab.</td></tr></tbody></table>
+    </div>
+  </section>
+
+  <!-- DECISION TREE & PRUNING -->
+  <section id="decision_tree">
+    <h2 class="section-title">Decision Tree & Pruning Analysis <span style="font-size:12px; color:var(--text-muted); font-weight:400;">— Module 3</span></h2>
+    <p class="section-sub">Mathematical evaluation of Entropy, Information Gain, Gini Index, MSE regression concept, Pre-pruning, and Cost-Complexity (Weakest-Link) Pruning.</p>
+    
+    <div class="grid grid-4" id="dtStatCards" style="margin-bottom:20px;">
+      <div class="loading">Loading Decision Tree analytics…</div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">1. Entropy & Information Gain (Root Node)</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Formula: <code>H(S) = -∑ p_i log₂(p_i)</code> · <code>IG = H(Parent) - ∑ (|S_v|/|S|) H(S_v)</code></p>
+        <div id="entropyDetail"><div class="loading">Loading…</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">2. Gini Index vs. Entropy Trees</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Formula: <code>Gini(S) = 1 - ∑ p_i²</code> (Impurity bounded in [0, 0.5])</p>
+        <div id="giniComparisonTable"><div class="loading">Loading…</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <h3 style="margin-top:0;">3. Mean Squared Error (MSE) / Regression Concept Demonstration</h3>
+      <div id="mseDemoContent"><div class="loading">Loading…</div></div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card chart-card">
+        <h3>Pre-Pruning: Tree Depth vs. Model Accuracy</h3>
+        <p>Prevents runaway tree growth by stopping early (max_depth, min_samples_leaf).</p>
+        <img src="/reports/decision_tree/prepruning_depth_curve.png" style="width:100%; border-radius:8px;" />
+      </div>
+      <div class="card chart-card">
+        <h3>Cost-Complexity Pruning: ccp_alpha vs. Accuracy</h3>
+        <p>Regularization path: <code>R_α(T) = R(T) + α|T|</code> evaluated on validation data.</p>
+        <img src="/reports/decision_tree/ccp_alpha_vs_accuracy.png" style="width:100%; border-radius:8px;" />
+      </div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card chart-card">
+        <h3>Cost-Complexity Pruning: ccp_alpha vs. Tree Complexity</h3>
+        <p>Demonstrates weakest-link subtree collapse as penalty α increases.</p>
+        <img src="/reports/decision_tree/ccp_alpha_vs_complexity.png" style="width:100%; border-radius:8px;" />
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">Weakest-Link Pruning Principle</h3>
+        <p style="font-size:13px; color:var(--text-dark); line-height:1.6;" id="weakestLinkExplanation">
+          Loading weakest-link explanation…
+        </p>
+        <div style="background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:14px; margin-top:12px;">
+          <div style="font-weight:700; font-size:12px; color:var(--text-muted); margin-bottom:4px;">MATHEMATICAL FORMULA:</div>
+          <code>g(t) = [R(t) - R(T_t)] / (|T_t| - 1)</code>
+          <p style="font-size:12px; color:var(--text-muted); margin:8px 0 0;">
+            Measures the cost-to-complexity ratio of collapsing subtree <i>T_t</i> into a single leaf <i>t</i>.
+            The node with minimal <i>g(t)</i> represents the weakest link and is pruned first.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card chart-card">
+      <h3>Decision Tree Visualization (Max Depth = 3)</h3>
+      <p>Visual path showing decision conditions, sample counts, impurity, and class predictions.</p>
+      <img src="/reports/decision_tree/decision_tree_visualization.png" style="width:100%; border-radius:8px;" />
+    </div>
+  </section>
+
+  <!-- RANDOM FOREST -->
+  <section id="random_forest">
+    <h2 class="section-title">Random Forest & Ensemble Learning <span style="font-size:12px; color:var(--text-muted); font-weight:400;">— Module 3</span></h2>
+    <p class="section-sub">Bagging, Bootstrap Sampling with Replacement, Random Feature Selection, Out-of-Bag (OOB) Score, and Majority Voting.</p>
+
+    <div class="grid grid-4" id="rfStatCards" style="margin-bottom:20px;">
+      <div class="loading">Loading Random Forest analytics…</div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">1. Bootstrap Sampling Mechanics</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Sampling with replacement on 5,680 training records.</p>
+        <div id="bootstrapDetails"><div class="loading">Loading…</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">2. Random Feature Selection</h3>
+        <p style="font-size:12px; color:var(--text-muted);">De-correlating trees by subsampling features per split.</p>
+        <div id="rfFeatureSelection"><div class="loading">Loading…</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <h3 style="margin-top:0;">3. Majority Voting: Individual Tree Breakdown on Test Samples</h3>
+      <p style="font-size:12px; color:var(--text-muted);">Real-time inspection of votes cast by all individual Decision Trees in the ensemble.</p>
+      <div style="overflow-x:auto;"><table id="majorityVotingTable"><tbody><tr><td class="loading">Loading…</td></tr></tbody></table></div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card chart-card">
+        <h3>Hyperparameter Analysis: Number of Trees vs. OOB Score</h3>
+        <p>Shows how increasing n_estimators stabilizes generalization error.</p>
+        <img src="/reports/random_forest/n_estimators_vs_oob_accuracy.png" style="width:100%; border-radius:8px;" />
+      </div>
+      <div class="card chart-card">
+        <h3>Feature Importance (Mean Decrease in Impurity)</h3>
+        <p>Comparison of feature importance between Random Forest and a single Decision Tree.</p>
+        <img src="/reports/random_forest/feature_importance.png" style="width:100%; border-radius:8px;" />
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;">Feature Importance Ranking Table</h3>
+      <div id="rfFeatureImportanceTable"><div class="loading">Loading…</div></div>
+    </div>
+  </section>
+
+  <!-- MODEL COMPARISON -->
+  <section id="model_comparison">
+    <h2 class="section-title">Model Comparison & Test Evaluation <span style="font-size:12px; color:var(--text-muted); font-weight:400;">— Module 3</span></h2>
+    <p class="section-sub">Comprehensive benchmarking across all 5 model architectures on the untouched held-out test set.</p>
+
+    <div class="card" style="margin-bottom:16px;">
+      <h3 style="margin-top:0;">Held-Out Test Benchmark Table</h3>
+      <p style="font-size:12px; color:var(--text-muted);">Evaluated on 1,218 unseen test instances with zero data leakage.</p>
+      <div style="overflow-x:auto;"><table id="benchmarkTable"><tbody><tr><td class="loading">Loading…</td></tr></tbody></table></div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card chart-card">
+        <h3>Test Metric Comparison Across Architectures</h3>
+        <p>Accuracy, Precision, Recall, and F1-Score side-by-side.</p>
+        <img src="/reports/model_comparison/model_comparison_barchart.png" style="width:100%; border-radius:8px;" />
+      </div>
+      <div class="card chart-card">
+        <h3>Confusion Matrices (Held-Out Test Set)</h3>
+        <p>True Positives, False Positives, True Negatives, False Negatives across models.</p>
+        <img src="/reports/model_comparison/confusion_matrices.png" style="width:100%; border-radius:8px;" />
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;">Selected Champion Rationale</h3>
+      <div id="championRationale" style="font-size:13px; line-height:1.6; color:var(--text-dark);">
+        Loading rationale…
+      </div>
+    </div>
+  </section>
+
+  <!-- MODULE 3 CURRICULUM -->
+  <section id="m3_curriculum">
+    <h2 class="section-title">Module 3 · Tree-Based Models & Modern Boosting</h2>
+    <p class="section-sub">Greedy recursive partitioning, Gini/Entropy, Cost-Complexity Pruning (CCP), Bagging & OOB, Modern Histogram GBDTs (LightGBM/XGBoost style), Feature Importance triad (MDI, Permutation, SHAP), and the Kaggle tabular reality.</p>
+
+    <div class="grid grid-4" id="m3StatCards" style="margin-bottom:20px;">
+      <div class="loading">Loading Module 3 analytics…</div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">1. Splitting Criteria From Scratch</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Gini Impurity <code>G = 1 - ∑ p_k²</code> vs. Shannon Entropy <code>H = -∑ p_k log₂(p_k)</code></p>
+        <div id="m3SplittingDetail"><div class="loading">Loading…</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">2. Cost-Complexity Pruning Path (CCP)</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Regularization path <code>R_α(T) = R(T) + α|T|</code> with weakest-link collapse</p>
+        <div id="m3CcpDetail"><div class="loading">Loading…</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <h3 style="margin-top:0;">3. Kaggle Tabular Reality: Linear Baseline vs. Gradient Boosted Tree</h3>
+      <p style="font-size:12px; color:var(--text-muted);">Why tree ensembles consistently outperform neural networks and linear models on structured tabular data.</p>
+      <div style="overflow-x:auto;"><table id="m3BenchmarkTable"><tbody><tr><td class="loading">Loading…</td></tr></tbody></table></div>
+      <div style="margin-top:12px; background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:12px; font-size:12px; color:var(--text-dark);" id="m3KaggleNote"></div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">4. Feature Importance Triad</h3>
+        <p style="font-size:12px; color:var(--text-muted);">MDI Gini Impurity vs. Permutation Importance (out-of-sample) vs. SHAP values</p>
+        <div id="m3ImportanceTable"><div class="loading">Loading…</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">5. Random Forest & Bagging Theory</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Bootstrap sampling with replacement and variance reduction argument</p>
+        <div id="m3RfBagging"><div class="loading">Loading…</div></div>
+<div class="code-box">
+  <div class="code-box-header"><span>💻 Python Implementation · Tree Models, GBDT, & SHAP Importance (M3)</span><button class="copy-code-btn" onclick="copyCode(this)">Copy Code</button></div>
+  <pre>from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, HistGradientBoostingClassifier
+from sklearn.inspection import permutation_importance
+import numpy as np
+
+# 1. Cost-Complexity Pruning (CCP) Path
+clf = DecisionTreeClassifier(random_state=42)
+path = clf.cost_complexity_pruning_path(X_train, y_train)
+ccp_alphas, impurities = path.ccp_alphas, path.impurities
+# Select optimal alpha minimizing cross-validation error
+
+# 2. Modern Histogram Gradient Boosting (LightGBM/XGBoost style)
+gbdt = HistGradientBoostingClassifier(
+    max_iter=100,
+    learning_rate=0.08,
+    max_leaf_nodes=31,
+    l2_regularization=1.5,
+    random_state=42
+)
+gbdt.fit(X_train, y_train)
+
+# 3. Feature Importance Triad: Permutation Importance
+perm = permutation_importance(gbdt, X_val, y_val, n_repeats=10, random_state=42)
+for feat, imp in zip(feature_names, perm.importances_mean):
+    print(f"{feat:15s}: {imp:+.4f}")</pre>
+</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODULE 4 CURRICULUM -->
+  <section id="m4_curriculum">
+    <h2 class="section-title">Module 4 · Unsupervised Learning & Manifold Geometry</h2>
+    <p class="section-sub">Lloyd's K-Means algorithm, Elbow method & Silhouette validation, Mini-Batch K-Means at scale, Hierarchical clustering linkages (Single, Complete, Average, Ward), DBSCAN non-convex clusters & anomaly noise, PCA standardization pitfall, t-SNE non-metric manifold axiom, and downstream cluster feature engineering.</p>
+
+    <div class="grid grid-4" id="m4StatCards" style="margin-bottom:20px;">
+      <div class="loading">Loading Module 4 analytics…</div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">1. K-Means Model Selection (Elbow & Silhouette)</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Evaluating inertia (WCSS) drop vs. Silhouette score <code>s(i) = (b - a)/max(a, b)</code> across K=2..6</p>
+        <div id="m4KmeansTable"><div class="loading">Loading…</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">2. DBSCAN vs. K-Means on Non-Convex Geometry</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Density reachability (ε, minPts) discovering non-linear manifolds and isolating noise points naturally.</p>
+        <div id="m4DbscanDetail"><div class="loading">Loading…</div></div>
+      </div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">3. Hierarchical Clustering Linkages & Cophenetic Correlation</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Dendrogram faithfulness metric measuring correlation with pairwise distances</p>
+        <div id="m4LinkageTable"><div class="loading">Loading…</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">4. PCA Standardization Pitfall (Production Hazard)</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Why PCA without StandardScaler causes high-magnitude units to falsely capture ~100% variance</p>
+        <div id="m4PcaDetail"><div class="loading">Loading…</div></div>
+      </div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">5. Anomaly Detection Paradigms</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Isolation Forest vs. One-Class SVM vs. PCA Reconstruction Residuals on 50 true outliers</p>
+        <div id="m4AnomalyDetail"><div class="loading">Loading…</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">6. Cluster Labels as Features for Supervised Models</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Engineering centroid distance features to linearize complex non-linear classification manifolds</p>
+        <div id="m4DownstreamDetail"><div class="loading">Loading…</div></div>
+<div class="code-box">
+  <div class="code-box-header"><span>💻 Python Implementation · PCA Pitfall Fix, DBSCAN & Anomaly Detection (M4)</span><button class="copy-code-btn" onclick="copyCode(this)">Copy Code</button></div>
+  <pre>from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.cluster import DBSCAN
+from sklearn.ensemble import IsolationForest
+from sklearn.pipeline import make_pipeline
+
+# 1. PCA Standardization Protection: NEVER run PCA on raw unscaled features!
+# Without StandardScaler, high-magnitude features (e.g. Light ~ 8000 lux) dominate ~100% variance.
+safe_pca = make_pipeline(StandardScaler(), PCA(n_components=2))
+X_pca = safe_pca.fit_transform(X)
+
+# 2. DBSCAN for Non-Convex Clusters & Automatic Noise Outlier Isolation
+dbscan = DBSCAN(eps=0.5, min_samples=5)
+labels = dbscan.fit_predict(X_scaled)
+n_noise = np.sum(labels == -1)
+
+# 3. Isolation Forest Anomaly Detection
+iso = IsolationForest(contamination=0.05, random_state=42)
+outliers = iso.fit_predict(X)  # -1 for anomaly, +1 for normal</pre>
+</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODULE 5 CURRICULUM -->
+  <section id="m5_curriculum">
+    <h2 class="section-title">Module 5 · Model Evaluation, Selection, and Calibration</h2>
+    <p class="section-sub">Three-way split discipline, Stratified & Nested Cross-Validation (unbiased error estimation), Classification metrics under 95:5 class imbalance, ROC-AUC vs. PR-AUC, Probability calibration (Platt scaling & Isotonic regression), Hyperparameter search (Grid vs. Bergstra-Bengio Random search), Learning curves, and McNemar statistical significance.</p>
+
+    <div class="grid grid-4" id="m5StatCards" style="margin-bottom:20px;">
+      <div class="loading">Loading Module 5 analytics…</div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">1. Nested Cross-Validation (Eliminating Selection Bias)</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Inner CV tunes hyperparameters while Outer CV independently measures generalization error</p>
+        <div id="m5NestedCvDetail"><div class="loading">Loading…</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">2. Accuracy Paradox & PR-AUC vs. ROC-AUC (95:5 Imbalance)</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Why 95% accuracy lies, and why ROC-AUC looks deceptively high under severe class imbalance</p>
+        <div id="m5ImbalanceDetail"><div class="loading">Loading…</div></div>
+      </div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">3. Probability Calibration (Platt Scaling vs. Isotonic)</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Ensuring predicted P(y=1) = 0.70 empirically corresponds to 70% positive rate (Brier Score)</p>
+        <div id="m5CalibrationDetail"><div class="loading">Loading…</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">4. Hyperparameter Search: Grid vs. Random Search (Bergstra-Bengio)</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Theorem: Random Search samples broad subspace and converges faster for equal/lower compute</p>
+        <div id="m5SearchDetail"><div class="loading">Loading…</div></div>
+      </div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">5. Learning Curve Diagnostics (Bias vs. Variance)</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Diagnosing under-fitting, over-fitting, and data scarcity from sample size vs error gap</p>
+        <div id="m5LearningCurveTable"><div class="loading">Loading…</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">6. Statistical Significance for Model Comparison</h3>
+        <p style="font-size:12px; color:var(--text-muted);">McNemar's test with Edwards continuity correction on discordant classification errors</p>
+        <div id="m5SignificanceDetail"><div class="loading">Loading…</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODULE 6 CURRICULUM -->
+  <section id="m6_curriculum">
+    <h2 class="section-title">Module 6 · ML Engineering — From Notebook to Production</h2>
+    <p class="section-sub">Closing the notebook-to-production gap, Feature Store architecture (Feast pattern) & point-in-time correctness time-travel joins, Automated training-serving skew detection, Model packaging with metadata manifests, Production drift monitoring (PSI & Kolmogorov-Smirnov test), Real-time latency SLAs (p50/p95/p99), and MLOps tracking platforms (MLflow & DVC).</p>
+
+    <div class="grid grid-4" id="m6StatCards" style="margin-bottom:20px;">
+      <div class="loading">Loading Module 6 analytics…</div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">1. Feature Store & Point-in-Time Time-Travel Join</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Offline historical warehouse table vs. Online sub-millisecond Redis KV cache</p>
+        <div id="m6FeatureStoreDetail"><div class="loading">Loading…</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">2. Training-Serving Skew Automated Detector</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Runtime contract enforcement catching missing columns, unseen features, and type mismatches</p>
+        <div id="m6SkewDetail"><div class="loading">Loading…</div></div>
+      </div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">3. Production Drift Monitoring (PSI & KS-Test)</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Population Stability Index (PSI) and 2-sample Kolmogorov-Smirnov test detecting covariate shift</p>
+        <div id="m6DriftDetail"><div class="loading">Loading…</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">4. Operational Serving Latencies (SLA Profiling)</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Benchmarking REST/gRPC latency percentiles under high concurrency</p>
+        <div id="m6LatencyDetail"><div class="loading">Loading…</div></div>
+      </div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">5. Model Packaging & Provenance Manifest</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Packaging model weights with immutable manifest recording schemas, hashes, and environment</p>
+        <div id="m6PackagingDetail"><div class="loading">Loading…</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">6. MLOps Ecosystem: MLflow & DVC Versioning</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Lightweight experiment tracking server and Git-backed artifact hash pointers</p>
+        <div id="m6MlopsDetail"><div class="loading">Loading…</div>
+<div class="code-box">
+  <div class="code-box-header"><span>💻 Python Implementation · Production MLOps: Drift Monitoring & FastAPI Serving (M6)</span><button class="copy-code-btn" onclick="copyCode(this)">Copy Code</button></div>
+  <pre>from scipy.stats import ks_2samp
+import numpy as np
+from fastapi import FastAPI
+from pydantic import BaseModel
+import onnxruntime as ort
+
+# 1. Production Data Drift Detection via Kolmogorov-Smirnov Test
+def detect_feature_drift(baseline_data, production_data, alpha=0.01):
+    stat, p_val = ks_2samp(baseline_data, production_data)
+    drift_detected = p_val < alpha
+    return {"ks_statistic": round(float(stat), 4), "p_value": round(float(p_val), 4), "drift": drift_detected}
+
+# 2. Ultra Low-Latency Model Serving with ONNX Runtime & FastAPI
+app = FastAPI(title="Produce Freshness Prediction API")
+session = ort.InferenceSession("models/champion_model.onnx")
+
+class ProducePayload(BaseModel):
+    Temp: float
+    Humid: float
+    Light: float
+    CO2: float
+
+@app.post("/predict")
+def serve_prediction(item: ProducePayload):
+    inputs = np.array([[item.Temp, item.Humid, item.Light, item.CO2]], dtype=np.float32)
+    ort_inputs = {session.get_inputs()[0].name: inputs}
+    proba = session.run(None, ort_inputs)[1][0][1] # P(Good)
+    return {"label": "Good" if proba >= 0.5 else "Bad", "probability": round(float(proba), 4)}</pre>
+</div></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================================================================== -->
+  <!-- MODULE A: TRAIN / VAL / TEST SPLIT & LEAKAGE (M5-1)                    -->
+  <!-- ===================================================================== -->
+  <section id="module_a">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+      <div>
+        <h2 class="section-title">Module A (M5-1) · Train / Validation / Test Split Discipline & Data Leakage</h2>
+        <p class="section-sub">Source: <code>module_5_session_M5_S1 (L59-60).pptx</code> (23 Slides) · Minimizing Empirical Risk vs. True Risk, 3-Way Partitioning, Data Leakage Taxonomy, 4-Fold CV Execution, and Vault-Locked Final Evaluation.</p>
+      </div>
+      <span class="pill good" style="font-size:13px; padding:6px 12px;">Authoritative Deck: M5-1</span>
+    </div>
+
+    <div class="grid grid-4" style="margin-bottom:20px;">
+      <div class="card"><div class="stat-label">Split Discipline</div><div class="stat-value" style="color:var(--accent-teal);">80% / 20%</div><div class="stat-foot">Dev Set (8) / Vault Test (2)</div></div>
+      <div class="card"><div class="stat-label">Cross-Validation</div><div class="stat-value">4-Fold</div><div class="stat-foot">Stratified K-Fold on Dev</div></div>
+      <div class="card"><div class="stat-label">Development CV Accuracy</div><div class="stat-value" id="modA_cvAcc">100%</div><div class="stat-foot">Mean: 1.0000 (±0.0000)</div></div>
+      <div class="card"><div class="stat-label">Vault-Locked Test Acc</div><div class="stat-value" id="modA_testAcc">100%</div><div class="stat-foot">Evaluated strictly once</div></div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">1. 4-Fold Stratified Cross-Validation Execution Matrix</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Allocation matrix of development students S01–S08 across 4 validation iterations (Slide 19):</p>
+        <div id="modA_matrixDetail"><div class="loading">Loading matrix…</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">2. Vault-Locked Test Set Evaluation (S09 & S10)</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Unbiased test predictions evaluated only after pipeline finalization (Slide 16):</p>
+        <div id="modA_testDetail"><div class="loading">Loading test results…</div></div>
+      </div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">3. Data Leakage Taxonomy & Golden Engineering Rules</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Eliminating contamination across all operational pipeline stages (Slide 9):</p>
+        <table>
+          <thead><tr><th>Leakage Class</th><th>Mechanism</th><th>Production Remedy</th></tr></thead>
+          <tbody>
+            <tr><td><b>Preprocessing Leakage</b></td><td>Fitting scalers/imputers on full dataset prior to splitting</td><td>Encapsulate inside Scikit-Learn <code>Pipeline</code></td></tr>
+            <tr><td><b>Temporal Leakage</b></td><td>Using future features to predict historical states</td><td>Strict point-in-time time-travel joins</td></tr>
+            <tr><td><b>Target Contamination</b></td><td>Including features that encode ground-truth target</td><td>Automated feature dependency audits</td></tr>
+          </tbody>
+        </table>
+        <div class="warn-box" style="margin-top:12px;">🔒 <b>Golden Rule:</b> The test set must remain completely isolated from every modeling decision, hyperparameter tuning iteration, and feature transformation fit!</div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">4. Self-Assessment Concept Check Quiz (Slide 23)</h3>
+        <div id="modA_quizDetail"><div class="loading">Loading quiz…</div></div>
+<div class="code-box">
+  <div class="code-box-header"><span>💻 Python Implementation · Leakage-Free Pipeline & 4-Fold CV (M5-1)</span><button class="copy-code-btn" onclick="copyCode(this)">Copy Code</button></div>
+  <pre>from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import StratifiedKFold, cross_val_score
+
+# 1. Isolate Vault Test Set (S09, S10) BEFORE any scaling or parameter fitting
+X_dev, y_dev = X.loc[dev_indices], y.loc[dev_indices]
+X_test, y_test = X.loc[test_indices], y.loc[test_indices]
+
+# 2. Encapsulate StandardScaler inside Pipeline to prevent fold leakage
+pipeline = make_pipeline(StandardScaler(), LogisticRegression(random_state=42))
+
+# 3. 4-Fold Stratified CV on Dev Set (S01-S08)
+skf = StratifiedKFold(n_splits=4, shuffle=True, random_state=42)
+cv_scores = cross_val_score(pipeline, X_dev, y_dev, cv=skf, scoring='accuracy')
+# Mean CV Accuracy: 1.0000 (100% on placement benchmark)
+
+# 4. Final fit on entire Dev partition, strictly evaluate on vault-locked test set
+pipeline.fit(X_dev, y_dev)
+test_accuracy = pipeline.score(X_test, y_test)  # 1.0000</pre>
+</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================================== -->
+  <!-- MODULE B: STRATIFIED & NESTED CROSS-VALIDATION (M5-2)                  -->
+  <!-- ===================================================================== -->
+  <section id="module_b">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+      <div>
+        <h2 class="section-title">Module B (M5-2) · Stratified & Nested Cross-Validation</h2>
+        <p class="section-sub">Source: <code>module_5_session_M5_S2 (L61-62).pptx</code> (18 Slides) · Class Prior Preservation, Hyperparameter Selection Bias, Nested CV Double-Loop Scheme, and Model Fit Formula.</p>
+      </div>
+      <span class="pill good" style="font-size:13px; padding:6px 12px;">Authoritative Deck: M5-2</span>
+    </div>
+
+    <div class="grid grid-4" style="margin-bottom:20px;">
+      <div class="card"><div class="stat-label">Model Fits Formula</div><div class="stat-value" style="font-size:20px; color:var(--accent-teal);">N_fits</div><div class="stat-foot">K_out × (K_in × |Λ| + 1)</div></div>
+      <div class="card"><div class="stat-label">Benchmark Grid Fits</div><div class="stat-value" id="modB_totalFits">155 fits</div><div class="stat-foot">K_out=5, K_in=3, |Λ|=10</div></div>
+      <div class="card"><div class="stat-label">Unbiased Nested F1</div><div class="stat-value" id="modB_nestedF1">0.9430</div><div class="stat-foot">±0.0308 (Slide 11 benchmark)</div></div>
+      <div class="card"><div class="stat-label">Optimistic Inner Score</div><div class="stat-value" style="color:var(--accent-orange);">0.9600</div><div class="stat-foot">Selection bias: +0.0170</div></div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">1. Interactive Nested CV Model-Fit Calculator</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Dynamically compute required model trainings based on outer folds, inner folds, and hyperparameter lattice:</p>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
+          <div><label style="font-size:11px; font-weight:600;">K_outer Folds</label><input type="number" id="modB_in_kout" value="5" min="2" max="10" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--border);"></div>
+          <div><label style="font-size:11px; font-weight:600;">K_inner Folds</label><input type="number" id="modB_in_kin" value="3" min="2" max="10" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--border);"></div>
+          <div><label style="font-size:11px; font-weight:600;">Grid Options |Λ|</label><input type="number" id="modB_in_grid" value="10" min="1" max="100" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--border);"></div>
+        </div>
+        <button onclick="calculateModBFits()" class="predict-btn" style="padding:9px; font-size:12px; margin-top:0;">Recalculate Model Fits</button>
+        <div id="modB_fitsResult" style="margin-top:12px; padding:12px; background:#e9fbf6; border-radius:8px; font-weight:600;">5 × (3 × 10 + 1) = 155 total model training runs.</div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">2. Stratified K-Fold Class Prior Allocation (Slide 10)</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Exact preservation of 67% Placed / 33% Not Placed across all 5 evaluation folds (N=1,000):</p>
+        <div id="modB_proportionsTable"><div class="loading">Loading fold allocation…</div></div>
+      </div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">3. Inner Loop Grid Search vs. Outer Loop Trace</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Trace of hyperparameter selection over C in {0.01, 0.1, 1.0, 10.0} (Slide 11):</p>
+        <div id="modB_traceDetail"><div class="loading">Loading trace…</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">4. Self-Assessment Concept Checks (Slide 18)</h3>
+        <div id="modB_quizDetail"><div class="loading">Loading quiz…</div></div>
+<div class="code-box">
+  <div class="code-box-header"><span>💻 Python Implementation · Nested Stratified Cross-Validation (M5-2)</span><button class="copy-code-btn" onclick="copyCode(this)">Copy Code</button></div>
+  <pre>from sklearn.model_selection import StratifiedKFold, GridSearchCV, cross_val_score
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+
+# Double-loop architecture eliminating hyperparameter selection bias
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('model', LogisticRegression(max_iter=1000, random_state=42))
+])
+
+# Inner Loop: Tunes hyperparameter C on training folds only
+inner_cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=42)
+grid_search = GridSearchCV(
+    estimator=pipeline,
+    param_grid={'model__C': [0.01, 0.1, 1.0, 10.0]},
+    cv=inner_cv,
+    scoring='f1'
+)
+
+# Outer Loop: Unbiased generalization estimation on held-out test folds
+outer_cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+nested_f1_scores = cross_val_score(grid_search, X, y, cv=outer_cv, scoring='f1')
+
+# Total model fits: K_out * (K_in * |Lambda| + 1) = 5 * (3 * 4 + 1) = 65 fits
+print(f"Unbiased Nested F1: {nested_f1_scores.mean():.4f} (+/- {nested_f1_scores.std()*2:.4f})")</pre>
+</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================================== -->
+  <!-- MODULE C: CLASSIFICATION & REGRESSION METRICS (M5-3)                  -->
+  <!-- ===================================================================== -->
+  <section id="module_c">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+      <div>
+        <h2 class="section-title">Module C (M5-3) · Classification & Regression Metrics</h2>
+        <p class="section-sub">Source: <code>Module_5_Session_M5-3.pptx</code> (15 Slides) · Accuracy Paradox, Precision/Recall/F1/F-beta, Outlier Sensitivity (RMSE vs MAE), Huber Loss (δ=1.345), and 10-Student Case Study.</p>
+      </div>
+      <span class="pill good" style="font-size:13px; padding:6px 12px;">Authoritative Deck: M5-3</span>
+    </div>
+
+    <div class="grid grid-4" style="margin-bottom:20px;">
+      <div class="card"><div class="stat-label">Case Study Accuracy</div><div class="stat-value" style="color:var(--accent-teal);">90.0%</div><div class="stat-foot">9/10 correct (S08 False Alarm)</div></div>
+      <div class="card"><div class="stat-label">Precision & Recall</div><div class="stat-value">83.3% / 100%</div><div class="stat-foot">F1: 90.91% · F0.5: 86.2%</div></div>
+      <div class="card"><div class="stat-label">MAE (Robust L1)</div><div class="stat-value">$6.50k</div><div class="stat-foot">SAE: $65.0k (10 students)</div></div>
+      <div class="card"><div class="stat-label">RMSE (Outlier L2)</div><div class="stat-value" style="color:var(--accent-orange);">$14.54k</div><div class="stat-foot">2.24× MAE (Dominated by S08)</div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <h3 style="margin-top:0;">1. Exact 10-Student Placement & Salary Package Benchmark (Slide 9 & 11)</h3>
+      <p style="font-size:12px; color:var(--text-muted);">Complete student performance and outlier salary error record ($45k anomaly on S08):</p>
+      <div id="modC_tableDetail" style="overflow-x:auto;"><div class="loading">Loading table…</div></div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">2. Interactive Huber Loss & F-beta Simulator</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Test the smooth transition between quadratic MSE and linear MAE at δ = 1.345:</p>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+          <div><label style="font-size:11px; font-weight:600;">Residual Error e ($k)</label><input type="number" id="modC_in_err" value="4.0" step="0.5" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--border);"></div>
+          <div><label style="font-size:11px; font-weight:600;">Huber Threshold δ</label><input type="number" id="modC_in_delta" value="1.345" step="0.05" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--border);"></div>
+        </div>
+        <button onclick="calculateModCHuber()" class="predict-btn" style="padding:9px; font-size:12px; margin-top:0;">Evaluate Loss Functions</button>
+        <div id="modC_huberResult" style="margin-top:12px; padding:12px; background:#f4f6fb; border-radius:8px;">
+          <div class="metric-row"><span>Huber Loss L_δ(e)</span><span><b>4.4813</b></span></div>
+          <div class="metric-row"><span>MSE Loss (0.5·e²)</span><span>8.0000 (Exploding penalty)</span></div>
+          <div class="metric-row"><span>MAE Loss (|e|)</span><span>4.0000 (Constant slope)</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">3. Self-Assessment Concept Checks (Slide 14)</h3>
+        <div id="modC_quizDetail"><div class="loading">Loading quiz…</div></div>
+<div class="code-box">
+  <div class="code-box-header"><span>💻 Python Implementation · F-Beta Harmonic Mean & Huber Loss (M5-3)</span><button class="copy-code-btn" onclick="copyCode(this)">Copy Code</button></div>
+  <pre>import numpy as np
+
+def compute_f_beta(precision: float, recall: float, beta: float = 1.0) -> float:
+    """Generalized F-beta: (1 + beta^2) * (P * R) / (beta^2 * P + R)"""
+    if precision + recall == 0:
+        return 0.0
+    b2 = beta ** 2
+    return float((1 + b2) * (precision * recall) / (b2 * precision + recall))
+
+def compute_huber_loss(residuals: np.ndarray, delta: float = 1.345) -> np.ndarray:
+    """Huber Hybrid Loss: quadratic for |e| <= delta, linear for |e| > delta"""
+    abs_e = np.abs(residuals)
+    return np.where(abs_e <= delta, 0.5 * (residuals ** 2), delta * (abs_e - 0.5 * delta))
+
+# Slide 9-11 Case Study: S08 outlier error e = $45k
+residuals = np.array([3.0, 0.0, 5.0, 0.0, 5.0, 0.0, 5.0, 45.0, 2.0, 0.0])
+huber = compute_huber_loss(residuals, delta=1.345)
+mae = np.mean(np.abs(residuals))    # $6.50k
+rmse = np.sqrt(np.mean(residuals**2)) # $14.54k</pre>
+</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================================== -->
+  <!-- MODULE D: CONFUSION MATRIX & ROC-AUC (M5-4)                           -->
+  <!-- ===================================================================== -->
+  <section id="module_d">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+      <div>
+        <h2 class="section-title">Module D (M5-4) · Confusion Matrix, Decision Thresholds & ROC-AUC</h2>
+        <p class="section-sub">Source: <code>Module_5_Session_M5-4.pptx</code> (15 Slides) · Full 2×2 Matrix, Expected Loss C_FP·FP + C_FN·FN, Threshold Trajectory (≥0.90, ≥0.72, ≥0.50, ≥0.30), Youden's J Optimization, and Pairwise Probabilistic Ranking.</p>
+      </div>
+      <span class="pill good" style="font-size:13px; padding:6px 12px;">Authoritative Deck: M5-4</span>
+    </div>
+
+    <div class="grid grid-4" style="margin-bottom:20px;">
+      <div class="card"><div class="stat-label">Optimal Threshold (Youden J)</div><div class="stat-value" style="color:var(--accent-teal);">τ* = 0.72</div><div class="stat-foot">Max J = 1.0000 (Slide 10)</div></div>
+      <div class="card"><div class="stat-label">Pairwise Ranking AUC</div><div class="stat-value">1.0000</div><div class="stat-foot">25/25 satisfied pairs (Slide 11)</div></div>
+      <div class="card"><div class="stat-label">Default Cutoff (τ=0.50)</div><div class="stat-value">90.0%</div><div class="stat-foot">Precision 83.3% (S08 False Alarm)</div></div>
+      <div class="card"><div class="stat-label">Conservative (τ=0.90)</div><div class="stat-value" style="color:var(--accent-orange);">70.0%</div><div class="stat-foot">Zero FP, misses 60% of placed</div></div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">1. Interactive Decision Threshold Slider & Asymmetric Cost Evaluator</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Adjust decision threshold τ and error costs to recalculate the 2×2 matrix in real-time:</p>
+        <div style="margin-bottom:12px;">
+          <label style="font-size:12px; font-weight:600;">Threshold τ: <span id="modD_tauLabel" style="color:var(--accent-teal); font-weight:800;">0.72</span></label>
+          <input type="range" id="modD_in_tau" min="0.10" max="0.95" step="0.01" value="0.72" oninput="updateModDInteractive()" style="width:100%; margin-top:6px;">
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+          <div><label style="font-size:11px; font-weight:600;">Cost of False Alarm (C_FP)</label><input type="number" id="modD_in_cfp" value="1.0" step="0.5" oninput="updateModDInteractive()" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--border);"></div>
+          <div><label style="font-size:11px; font-weight:600;">Cost of Miss (C_FN)</label><input type="number" id="modD_in_cfn" value="5.0" step="0.5" oninput="updateModDInteractive()" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--border);"></div>
+        </div>
+        <div id="modD_interactiveCard" style="background:#f4f6fb; padding:12px; border-radius:8px;">
+          <div class="metric-row"><span>Confusion Matrix</span><span id="modD_dynCm">TP: 5 | FP: 0 | TN: 5 | FN: 0</span></div>
+          <div class="metric-row"><span>Sensitivity (TPR) / Specificity (TNR)</span><span id="modD_dynTpr">1.0000 / 1.0000</span></div>
+          <div class="metric-row"><span>Youden's J-Statistic (TPR − FPR)</span><span id="modD_dynYouden"><b>1.0000 (Maximum!)</b></span></div>
+          <div class="metric-row"><span>Total Expected Loss</span><span id="modD_dynLoss"><b>$0.00</b></span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">2. Operational Threshold Trajectory Benchmark (Slide 10)</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Complete policy progression across conservative, optimal, default, and permissive cutoffs:</p>
+        <div id="modD_trajectoryTable"><div class="loading">Loading trajectory…</div></div>
+      </div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">3. Pairwise Probabilistic Ranking Breakdown (Slide 11)</h3>
+        <p style="font-size:12px; color:var(--text-muted);">AUC = P(p̂(X_pos) > p̂(X_neg)) = U / (N_pos × N_neg):</p>
+        <div style="background:#e9fbf6; padding:12px; border-radius:8px; font-size:13px; line-height:1.5;">
+          <b>Positives (5):</b> S03(0.95), S07(0.91), S01(0.88), S09(0.82), S05(0.72)<br>
+          <b>Negatives (5):</b> S08(0.60), S06(0.40), S02(0.25), S10(0.20), S04(0.15)<br><br>
+          All 5 positive students have scores strictly greater than all 5 negative students! S05 (lowest pos, p=0.72) > S08 (highest neg, p=0.60).<br>
+          <b>Satisfied Pairs:</b> 25 / 25 = 1.00 → <b>ROC-AUC = 1.0000</b>.
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">4. Self-Assessment Concept Checks (Slide 14)</h3>
+        <div id="modD_quizDetail"><div class="loading">Loading quiz…</div></div>
+<div class="code-box">
+  <div class="code-box-header"><span>💻 Python Implementation · ROC Threshold Trajectory & Pairwise AUC (M5-4)</span><button class="copy-code-btn" onclick="copyCode(this)">Copy Code</button></div>
+  <pre>from sklearn.metrics import confusion_matrix, roc_curve, roc_auc_score
+import numpy as np
+
+def evaluate_threshold(y_true, y_probs, tau=0.72, c_fp=1.0, c_fn=5.0):
+    y_pred = (y_probs >= tau).astype(int)
+    cm = confusion_matrix(y_true, y_pred, labels=[0, 1])
+    tn, fp, fn, tp = cm[0,0], cm[0,1], cm[1,0], cm[1,1]
+    tpr = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+    fpr = fp / (fp + tn) if (fp + tn) > 0 else 0.0
+    youden_j = tpr - fpr
+    dist_corner = np.sqrt((1.0 - tpr)**2 + fpr**2)
+    expected_loss = c_fp * fp + c_fn * fn
+    return {"TP": tp, "FP": fp, "TN": tn, "FN": fn, "TPR": tpr, "FPR": fpr, "Youden_J": youden_j, "Loss": expected_loss}
+
+# Optimal Cutoff tau* = 0.72 achieves Youden's J = 1.0000 (Perfect separation)
+# Pairwise Ranking AUC: U / (N_pos * N_neg) = 25 / (5 * 5) = 1.0000</pre>
+</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================================== -->
+  <!-- MODULE E: PR CURVES & CLASS IMBALANCE (M5-5)                          -->
+  <!-- ===================================================================== -->
+  <section id="module_e">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+      <div>
+        <h2 class="section-title">Module E (M5-5) · Precision-Recall Curves & Class Imbalance</h2>
+        <p class="section-sub">Source: <code>Module_5_Session_M5-5.pptx</code> (15 Slides) · FPR Denominator Dilution Flaw, 100k Sample Dilution Proof, Baseline PR-AUC = π, 10-Student 20% Imbalance Trajectory, and Slide 11 Hand Problem.</p>
+      </div>
+      <span class="pill good" style="font-size:13px; padding:6px 12px;">Authoritative Deck: M5-5</span>
+    </div>
+
+    <div class="grid grid-4" style="margin-bottom:20px;">
+      <div class="card"><div class="stat-label">Random PR Baseline</div><div class="stat-value" style="color:var(--accent-teal);">π = 20.0%</div><div class="stat-foot">Equal to positive prevalence</div></div>
+      <div class="card"><div class="stat-label">Optimal Threshold (Peak F1)</div><div class="stat-value">τ* = 0.90</div><div class="stat-foot">F1: 100% · Precision: 100%</div></div>
+      <div class="card"><div class="stat-label">Default τ=0.50 Precision</div><div class="stat-value" style="color:var(--accent-red);">33.3%</div><div class="stat-foot">False alarm rate: 66.7%!</div></div>
+      <div class="card"><div class="stat-label">Slide 11 Average Precision</div><div class="stat-value">0.854</div><div class="stat-foot">+0.354 gain over baseline (0.50)</div></div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">1. The 100,000-Sample FPR Dilution Proof (Slide 3)</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Why ROC-AUC is dangerously deceptive when positive prevalence π < 5%:</p>
+        <div style="background:#fdeeee; border:1px solid #f6c9c8; padding:14px; border-radius:8px; font-size:13px; line-height:1.5;">
+          <b>Setup:</b> 100 Positives, 99,000 Negatives (π = 0.10%).<br>
+          <b>Model Hits:</b> 90 True Positives, 990 False Positives.<br>
+          • <b>Recall:</b> 90 / 100 = <b>90.0%</b><br>
+          • <b>FPR:</b> 990 / 99,000 = <b>1.0%</b> (ROC curve looks world-class!)<br>
+          • <b>Precision:</b> 90 / (90 + 990) = <b>8.33%</b> (11 false alarms for every 1 real hit!)<br><br>
+          <b>Conclusion:</b> The massive pool of 99,000 true negatives dilutes the FPR denominator, masking high false alarm volume. <b>PR-AUC directly reflects operational reality.</b>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">2. 10-Student 20% Placement Imbalance Trajectory (Slide 9)</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Precision, Recall & F1 trajectory across thresholds (Slide 9):</p>
+        <div id="modE_trajectoryTable"><div class="loading">Loading trajectory…</div></div>
+      </div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">3. Practice Problem: Precision-Recall by Hand (Slide 11)</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Step-by-step hand calculation with Average Precision (AP) formulation:</p>
+        <div id="modE_practiceDetail"><div class="loading">Loading practice solution…</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">4. Self-Assessment Concept Checks (Slide 15)</h3>
+        <div id="modE_quizDetail"><div class="loading">Loading quiz…</div></div>
+<div class="code-box">
+  <div class="code-box-header"><span>💻 Python Implementation · Precision-Recall Trajectory & Average Precision (M5-5)</span><button class="copy-code-btn" onclick="copyCode(this)">Copy Code</button></div>
+  <pre>from sklearn.metrics import precision_recall_curve, average_precision_score
+import numpy as np
+
+# 100k Dilution Demo: 100 Positives, 99,000 Negatives
+# 90 TP, 990 FP -> Recall = 90.0%, FPR = 1.0% (looks great), but Precision = 8.33% (91.7% false alarms!)
+
+# Placement Benchmark under 20% Imbalance:
+precision, recall, thresholds = precision_recall_curve(y_true, y_probs)
+ap_score = average_precision_score(y_true, y_probs)
+
+# Slide 11 Hand Calculation: Rank hits at [0.90, 0.80, 0.60, 0.40]
+# Precisions at hits: [1/1, 2/2, 3/4, 4/6] -> AP = mean([1.0, 1.0, 0.75, 0.667]) = 0.854
+# Massive gain over random baseline prevalence pi = 0.50 (+0.354 gain)</pre>
+</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================================== -->
+  <!-- MODULE F: CALIBRATION & BRIER SCORE (M5-6)                            -->
+  <!-- ===================================================================== -->
+  <section id="module_f">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+      <div>
+        <h2 class="section-title">Module F · Probability Calibration, Platt Scaling & Brier Score</h2>
+        <p class="section-sub">Source: <code>Probability_Calibration_Placement.pptx</code> (13 Slides) & <code>M5-6_to_M5-8</code> · Trustworthy Probabilities, Platt Sigmoid Scaling, Isotonic Regression PAVA, and 10-Student Brier Score Reduction.</p>
+      </div>
+      <span class="pill good" style="font-size:13px; padding:6px 12px;">Authoritative Deck: Calibration</span>
+    </div>
+
+    <div class="grid grid-4" style="margin-bottom:20px;">
+      <div class="card"><div class="stat-label">Student S7 Raw Score</div><div class="stat-value">0.600</div><div class="stat-foot">Log-odds f = ln(1.5) = 0.405</div></div>
+      <div class="card"><div class="stat-label">S7 Platt Calibrated</div><div class="stat-value" style="color:var(--accent-teal);">0.819</div><div class="stat-foot">a=1.773, b=0.789 (Slide 6)</div></div>
+      <div class="card"><div class="stat-label">Raw Model Brier Score</div><div class="stat-value">0.157</div><div class="stat-foot">10-student illustrative baseline</div></div>
+      <div class="card"><div class="stat-label">Calibrated Brier Score</div><div class="stat-value" style="color:var(--accent-teal);">0.143 / 0.100</div><div class="stat-foot">Platt (0.143) · Isotonic (0.100)</div></div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">1. Interactive Platt Scaling Sigmoid Simulator</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Transform any raw probability score through learned parameters a and b:</p>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
+          <div><label style="font-size:11px; font-weight:600;">Raw Prob p_raw</label><input type="number" id="modF_in_praw" value="0.60" step="0.05" min="0.01" max="0.99" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--border);"></div>
+          <div><label style="font-size:11px; font-weight:600;">Parameter a</label><input type="number" id="modF_in_a" value="1.773" step="0.1" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--border);"></div>
+          <div><label style="font-size:11px; font-weight:600;">Parameter b</label><input type="number" id="modF_in_b" value="0.789" step="0.1" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--border);"></div>
+        </div>
+        <button onclick="calculateModFPlatt()" class="predict-btn" style="padding:9px; font-size:12px; margin-top:0;">Calibrate Probability</button>
+        <div id="modF_plattResult" style="margin-top:12px; padding:12px; background:#e9fbf6; border-radius:8px;">
+          Log-odds f = ln(0.60 / 0.40) ≈ <b>0.405</b> → Calibrated: <b>0.819</b> (Matches Slide 6!)
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">2. 5-Student Brier Score Hand Exercise (Slide 10)</h3>
+        <p style="font-size:12px; color:var(--text-muted);">BS = (1/N) × Σ (pᵢ − yᵢ)² · Penalizing confident wrong assertions:</p>
+        <table>
+          <thead><tr><th>Student</th><th>Predicted p</th><th>Actual y</th><th>Squared Error (p − y)²</th></tr></thead>
+          <tbody>
+            <tr><td>S1</td><td>0.80</td><td>1</td><td>0.04</td></tr>
+            <tr><td>S2</td><td>0.20</td><td>0</td><td>0.04</td></tr>
+            <tr><td>S3</td><td>0.60</td><td>1</td><td>0.16</td></tr>
+            <tr><td>S4</td><td>0.40</td><td>0</td><td>0.16</td></tr>
+            <tr><td>S5</td><td>0.70</td><td>1</td><td>0.09</td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:10px; font-weight:700;">Sum of Squared Errors = 0.49 → Brier Score = 0.49 / 5 = <span style="color:var(--accent-teal);">0.098</span></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <h3 style="margin-top:0;">3. 10-Student Placement Calibration Benchmark (Slide 4, 7, 9)</h3>
+      <p style="font-size:12px; color:var(--text-muted);">Comparing Raw probabilities against Platt Scaling and PAVA Isotonic Regression:</p>
+      <div id="modF_tableDetail" style="overflow-x:auto;"><div class="loading">Loading calibration table…</div>
+<div class="code-box">
+  <div class="code-box-header"><span>💻 Python Implementation · Platt Scaling Sigmoid & Isotonic PAVA (M5-6)</span><button class="copy-code-btn" onclick="copyCode(this)">Copy Code</button></div>
+  <pre>import numpy as np
+from sklearn.isotonic import IsotonicRegression
+
+# 1. Platt Scaling: p_cal = 1 / (1 + exp(-(a*f + b))), where f = ln(p/(1-p))
+def platt_scale_manual(p_raw, a=1.773, b=0.789):
+    eps = 1e-12
+    p_clipped = np.clip(p_raw, eps, 1 - eps)
+    f = np.log(p_clipped / (1 - p_clipped)) # Log-odds logit
+    return 1.0 / (1.0 + np.exp(-(a * f + b)))
+
+# S7 Worked Example: p = 0.60 -> f = ln(1.5) = 0.405 -> p_cal = 0.819
+s7_cal = platt_scale_manual(np.array([0.60]), a=1.773, b=0.789)[0]
+
+# 2. PAVA Isotonic Regression (Non-parametric step function)
+ir = IsotonicRegression(out_of_bounds="clip", y_min=0.0, y_max=1.0)
+p_iso = ir.fit_transform(p_raw, y_true)
+
+# 3. Brier Score Loss: (1/N) * sum((p - y)^2)
+# 10-Student Placement Benchmark: Raw (0.157) -> Platt (0.143) -> Isotonic (0.100)</pre>
+</div></div>
+    </div>
+  </section>
+
+  <!-- ===================================================================== -->
+  <!-- MODULE G: HYPERPARAMETER SEARCH (M5-7)                                -->
+  <!-- ===================================================================== -->
+  <section id="module_g">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+      <div>
+        <h2 class="section-title">Module G (M5-7) · Hyperparameter Search & Optimization</h2>
+        <p class="section-sub">Source: <code>Module_5_Session_M5-6_to_M5-8.pptx</code> (14 Slides) · Grid Search Lattice, Bergstra-Bengio Random Sampling Theorem, Bayesian Optimization (GP Surrogate & Expected Improvement), and Search Budget Problem.</p>
+      </div>
+      <span class="pill good" style="font-size:13px; padding:6px 12px;">Authoritative Deck: M5-7</span>
+    </div>
+
+    <div class="grid grid-4" style="margin-bottom:20px;">
+      <div class="card"><div class="stat-label">Grid Configurations</div><div class="stat-value">12 lattice</div><div class="stat-foot">4 learning rates × 3 depths</div></div>
+      <div class="card"><div class="stat-label">Grid Total Fits</div><div class="stat-value">60 fits</div><div class="stat-foot">12 configs × 5-fold CV</div></div>
+      <div class="card"><div class="stat-label">Random Search Top 5%</div><div class="stat-value" style="color:var(--accent-teal);">95.4% hit</div><div class="stat-foot">P(hit) = 1 − 0.95^60 (Slide 10)</div></div>
+      <div class="card"><div class="stat-label">95% Conf Sample Budget</div><div class="stat-value">n = 59</div><div class="stat-foot">n ≥ ln(0.05) / ln(0.95)</div></div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">1. Interactive Search Budget & Confidence Solver (Slide 10)</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Calculate exact grid fits and statistical sample count for arbitrary confidence levels:</p>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+          <div><label style="font-size:11px; font-weight:600;">Learning Rates</label><input type="number" id="modG_in_lr" value="4" min="1" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--border);"></div>
+          <div><label style="font-size:11px; font-weight:600;">Tree Depths</label><input type="number" id="modG_in_depth" value="3" min="1" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--border);"></div>
+        </div>
+        <button onclick="calculateModGBudget()" class="predict-btn" style="padding:9px; font-size:12px; margin-top:0;">Solve Search Budget</button>
+        <div id="modG_budgetResult" style="margin-top:12px; padding:12px; background:#f4f6fb; border-radius:8px;">
+          Grid requires <b>60 model fits</b>. Random search of 60 draws achieves <b>95.4% chance</b> of landing in top 5%. Exact 95% confidence requires <b>n = 59 samples</b>.
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">2. Bayesian Optimization GP Surrogate Model (Slide 9)</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Gaussian Process regressor (Matérn kernel ν=2.5) with Expected Improvement (EI):</p>
+        <div id="modG_gpDetail"><div class="loading">Loading GP surrogate trace…</div>
+<div class="code-box">
+  <div class="code-box-header"><span>💻 Python Implementation · Search Budget Solver & GP Expected Improvement (M5-7)</span><button class="copy-code-btn" onclick="copyCode(this)">Copy Code</button></div>
+  <pre>import math
+import numpy as np
+from scipy.stats import norm
+
+# Slide 10 Search Budget Theorem (Bergstra-Bengio):
+# P(at least one in top q) = 1 - (1 - q)^n
+# For q = 0.05 and n = 60: P = 1 - (0.95)^60 = 0.9539 (95.4%)
+# Minimum budget for 95% confidence: n >= ln(0.05) / ln(0.95) = 58.4 -> n = 59
+
+def compute_expected_improvement(mu, sigma, f_best):
+    """Expected Improvement: EI(theta) = (mu - f_best)*Phi(Z) + sigma*phi(Z)"""
+    z = (mu - f_best) / (sigma + 1e-9)
+    ei = (mu - f_best) * norm.cdf(z) + sigma * norm.pdf(z)
+    return np.maximum(ei, 0.0)</pre>
+</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <h3 style="margin-top:0;">3. Master Comparative Matrix: Hyperparameter Search Paradigms</h3>
+      <table>
+        <thead><tr><th>Method</th><th>Search Strategy</th><th>Sample Efficiency</th><th>Best Production Use Case</th></tr></thead>
+        <tbody>
+          <tr><td><b>Grid Search</b></td><td>Exhaustive combinatorial lattice</td><td>Low O(k^d)</td><td>Small parameter spaces (d ≤ 2)</td></tr>
+          <tr><td><b>Random Search</b></td><td>Uniform continuous sampling</td><td>High (Bergstra-Bengio)</td><td>General tuning default (d ≥ 3)</td></tr>
+          <tr><td><b>Bayesian Opt</b></td><td>GP / TPE surrogate + Expected Improvement</td><td>Maximum</td><td>Expensive training (Deep Learning / XGBoost)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===================================================================== -->
+  <!-- MODULE H: CLUSTER-AUGMENTED REGRESSION                                 -->
+  <!-- ===================================================================== -->
+  <section id="module_h">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+      <div>
+        <h2 class="section-title">Module H · Cluster-Augmented Regression (5-House Model)</h2>
+        <p class="section-sub">Source: <code>Cluster_Augmented_Regression (1).pptx</code> (10 Slides) · Demonstrating why an omitted Location/Cluster variable takes a regression from R² = 0.04 to a perfect R² = 1.00 fit.</p>
+      </div>
+      <span class="pill good" style="font-size:13px; padding:6px 12px;">Authoritative Deck: Cluster Regression</span>
+    </div>
+
+    <div class="grid grid-4" style="margin-bottom:20px;">
+      <div class="card"><div class="stat-label">Baseline Size-Only R²</div><div class="stat-value" style="color:var(--accent-red);">0.0400</div><div class="stat-foot">P̂ = 65.5 + 0.175·S (Slide 4)</div></div>
+      <div class="card"><div class="stat-label">Augmented Model R²</div><div class="stat-value" style="color:var(--accent-teal);">1.0000</div><div class="stat-foot">Every residual = $0.00 (Slide 9)</div></div>
+      <div class="card"><div class="stat-label">Cluster A Centroid</div><div class="stat-value">1.50</div><div class="stat-foot">Houses 1, 2 (Location L=1, 2)</div></div>
+      <div class="card"><div class="stat-label">Cluster B Centroid</div><div class="stat-value">8.50</div><div class="stat-foot">Houses 3, 4, 5 (Location L=8, 9, 8.5)</div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <h3 style="margin-top:0;">1. Complete 5-House Dataset & Residual Comparison (Slide 2 & 9)</h3>
+      <p style="font-size:12px; color:var(--text-muted);">Comparing baseline model predictions against cluster-augmented regression:</p>
+      <div id="modH_tableDetail" style="overflow-x:auto;"><div class="loading">Loading 5-house table…</div>
+<div class="code-box">
+  <div class="code-box-header"><span>💻 Python Implementation · Cluster-Augmented Regression (Location OLS Fix)</span><button class="copy-code-btn" onclick="copyCode(this)">Copy Code</button></div>
+  <pre>import numpy as np
+from sklearn.cluster import KMeans
+from sklearn.linear_model import LinearRegression
+
+# Exact 5-House Dataset:
+# House 1: L=1, S=1000, P=150 (Cluster A)  |  House 3: L=8, S=1000, P=300 (Cluster B)
+# House 2: L=2, S=1200, P=180 (Cluster A)  |  House 4: L=9, S=1200, P=340 (Cluster B)
+#                                          |  House 5: L=8.5, S=1100, P=320 (Cluster B)
+
+# Step 1: K-Means on Location -> Centroids at 1.5 and 8.5
+km = KMeans(n_clusters=2, random_state=42).fit(df[['Location_L']])
+df['Cluster_B'] = (km.labels_ == 1).astype(float)
+
+# Step 2: Baseline OLS (Size only): P_hat = 65.5 + 0.175*S -> R^2 = 0.039 (Residual bias!)
+# Step 3: Augmented OLS with Interaction: P_hat = 0.15*S + 100*C + 0.05*(S*C) -> R^2 = 1.000!
+X_aug = np.column_stack([df['Size_S'], df['Cluster_B'], df['Size_S'] * df['Cluster_B']])
+model_aug = LinearRegression().fit(X_aug, df['Price_P'])</pre>
+</div></div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">2. Interactive House Price Predictor</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Predict price using baseline OLS vs. Cluster-augmented interaction model:</p>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+          <div><label style="font-size:11px; font-weight:600;">Size S (sqft)</label><input type="number" id="modH_in_size" value="1100" step="50" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--border);"></div>
+          <div><label style="font-size:11px; font-weight:600;">Cluster Assignment</label>
+            <select id="modH_in_cluster" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--border);">
+              <option value="A">Cluster A (Low Price Corridor)</option>
+              <option value="B" selected>Cluster B (Prime Corridor)</option>
+            </select>
+          </div>
+        </div>
+        <button onclick="predictModHPrice()" class="predict-btn" style="padding:9px; font-size:12px; margin-top:0;">Calculate Prices</button>
+        <div id="modH_predResult" style="margin-top:12px; padding:12px; background:#e9fbf6; border-radius:8px;">
+          Baseline: <b>$258.0k</b> | Augmented: <b>$320.0k</b> (Cluster Premium: <b>+$62.0k</b>)
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">3. Mathematical Derivations & Takeaways</h3>
+        <div style="font-size:13px; line-height:1.5;">
+          <b>Baseline OLS Equation (Slide 4):</b><br>
+          <code>P̂ = 65.5 + 0.175·S</code> (R² ≈ 0.04)<br>
+          <i>Diagnosis:</i> Systematic negative residuals on Cluster A and positive on Cluster B proves omitted-variable bias.<br><br>
+          <b>Augmented Model Equation (Slide 9):</b><br>
+          <code>P̂ = 0.15·S + 100·C + 0.05·(S×C)</code> (R² = 1.0)<br>
+          <i>Cluster A (C=0):</i> P = 0.15·S ($150/sqft)<br>
+          <i>Cluster B (C=1):</i> P = 100 + 0.20·S ($100k fixed premium + $200/sqft)
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================================== -->
+  <!-- MODULE I: K-MEANS CLUSTERING (M4-1)                                    -->
+  <!-- ===================================================================== -->
+  <section id="module_i">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+      <div>
+        <h2 class="section-title">Module I (M4-1) · K-Means Clustering & Lloyd's Algorithm</h2>
+        <p class="section-sub">Source: <code>M4-Session1-KMeans_clustering-new.pptx</code> (32 Slides) · WCSS Inertia Objective, Lloyd's 2-Step Iterative Solver, K-Means++ Seeding, Elbow Method, and Slide 24 Hand Silhouette Calculation.</p>
+      </div>
+      <span class="pill good" style="font-size:13px; padding:6px 12px;">Authoritative Deck: M4-1</span>
+    </div>
+
+    <div class="grid grid-4" style="margin-bottom:20px;">
+      <div class="card"><div class="stat-label">Slide 24 Mean Silhouette</div><div class="stat-value" style="color:var(--accent-teal);">s̄ = 0.801</div><div class="stat-foot">Strong structure (0.71–1.00)</div></div>
+      <div class="card"><div class="stat-label">Point A Silhouette s(A)</div><div class="stat-value">0.834</div><div class="stat-foot">a(A)=1.000, b(A)=6.030</div></div>
+      <div class="card"><div class="stat-label">K-Means++ Bound</div><div class="stat-value">O(log K)</div><div class="stat-foot">Expected error vs optimal</div></div>
+      <div class="card"><div class="stat-label">Lloyd's Convergence</div><div class="stat-value">Finite</div><div class="stat-foot">Monotonic WCSS reduction</div></div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">1. Slide 24 Hand-Calculated Silhouette Table</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Hand calculation for C₁={A(1,1), B(2,1), C(1,2)} and C₂={D(5,5), E(6,5)}:</p>
+        <div id="modI_handTable"><div class="loading">Loading silhouette table…</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">2. 9-Point Outer Loop Elbow & Marginal Gain Trace (Slide 18)</h3>
+        <p style="font-size:12px; color:var(--text-muted);">WCSS Inertia curve and marginal gain reduction across K=2 through 5:</p>
+        <div id="modI_elbowTable"><div class="loading">Loading elbow trace…</div></div>
+      </div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">3. Comparison: Three Techniques, One Pipeline (Slide 27)</h3>
+        <table>
+          <thead><tr><th>Technique</th><th>Core Purpose</th><th>Metric</th><th>Computational Cost</th></tr></thead>
+          <tbody>
+            <tr><td><b>Lloyd's Alg</b></td><td>Optimize assignments for fixed K</td><td>WCSS J</td><td>O(n·K·d) per iteration</td></tr>
+            <tr><td><b>Elbow Method</b></td><td>Select optimal K via bend</td><td>WCSS vs K curve</td><td>Run K_max times</td></tr>
+            <tr><td><b>Silhouette Score</b></td><td>Validate cluster cohesion & separation</td><td>s(i) ∈ [−1, +1]</td><td>O(n²) full pairwise</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">4. Quick-Fire Viva Questions (Slide 31)</h3>
+        <div id="modI_vivaDetail"><div class="loading">Loading viva questions…</div>
+<div class="code-box">
+  <div class="code-box-header"><span>💻 Python Implementation · Lloyd's K-Means & Slide 24 Hand Silhouette</span><button class="copy-code-btn" onclick="copyCode(this)">Copy Code</button></div>
+  <pre>import numpy as np
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_samples, silhouette_score
+
+# Slide 24 Hand Silhouette Calculation:
+# Points: A(1,1), B(2,1), C(1,2) in C1; D(5,5), E(6,5) in C2
+# For A: a(A) = mean(dist(A,B), dist(A,C)) = (1 + 1)/2 = 1.000
+#        b(A) = mean(dist(A,D), dist(A,E)) = (5.657 + 6.403)/2 = 6.030
+#        s(A) = (b(A) - a(A)) / max(a(A), b(A)) = (6.030 - 1.000) / 6.030 = 0.834
+# Mean s_bar = 0.801 -> Strong cluster structure (0.71 to 1.00 range)
+
+# Lloyd's alternating steps:
+# 1. Assignment: c(i) = argmin_k ||x_i - mu_k||^2
+# 2. Update:     mu_k = (1 / |C_k|) * sum_{i in C_k} x_i</pre>
+</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================================== -->
+  <!-- MODULE J: HIERARCHICAL CLUSTERING (M4-2)                              -->
+  <!-- ===================================================================== -->
+  <section id="module_j">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+      <div>
+        <h2 class="section-title">Module J (M4-2) · Hierarchical Agglomerative Clustering</h2>
+        <p class="section-sub">Source: <code>M4-Session2-Hierarchical_Clustering-new.pptx</code> (21 Slides) · Bottom-Up HAC, 4 Linkage Methods, Lance-Williams Updates, 5-Point Distance Matrix, Ward Merge Sequence, and Retail Store Customer Segmentation.</p>
+      </div>
+      <span class="pill good" style="font-size:13px; padding:6px 12px;">Authoritative Deck: M4-2</span>
+    </div>
+
+    <div class="grid grid-4" style="margin-bottom:20px;">
+      <div class="card"><div class="stat-label">Running Points</div><div class="stat-value">5 Points</div><div class="stat-foot">A=2, B=4, C=10, D=12, E=18</div></div>
+      <div class="card"><div class="stat-label">Optimal Ward Cut</div><div class="stat-value" style="color:var(--accent-teal);">K = 2</div><div class="stat-foot">Largest gap: 5.72 → 11.32 (gap 5.60)</div></div>
+      <div class="card"><div class="stat-label">Ward First Merges</div><div class="stat-value">h = 1.41</div><div class="stat-foot">(A,B) and (C,D) at h=1.41</div></div>
+      <div class="card"><div class="stat-label">Retail Case Study</div><div class="stat-value">2 Segments</div><div class="stat-foot">P1-P3 (Casual) vs P4-P6 (VIP)</div></div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">1. Pairwise Distance Matrix on 5 Points (Slide 6)</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Exact distance matrix D[i,j] = |x_i − x_j| for A=2, B=4, C=10, D=12, E=18:</p>
+        <div id="modJ_distMatrix"><div class="loading">Loading distance matrix…</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">2. Ward Linkage Merge Sequence & Optimal Cut (Slide 10 & 13)</h3>
+        <p style="font-size:12px; color:var(--text-muted);">Step-by-step merge heights and cut partitions:</p>
+        <div id="modJ_wardMerges"><div class="loading">Loading Ward sequence…</div></div>
+      </div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3 style="margin-top:0;">3. Retail Customer Segmentation Case Study (Slide 19)</h3>
+        <p style="font-size:12px; color:var(--text-muted);">6 customers: P1(10,2), P2(12,3), P3(11,2), P4(60,15), P5(62,14), P6(58,16):</p>
+        <div id="modJ_retailDetail"><div class="loading">Loading retail case study…</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">4. Viva-Voce Questions (Slide 20)</h3>
+        <div id="modJ_vivaDetail"><div class="loading">Loading viva questions…</div>
+<div class="code-box">
+  <div class="code-box-header"><span>💻 Python Implementation · Hierarchical Ward Linkage & Optimal Cut (M4-2)</span><button class="copy-code-btn" onclick="copyCode(this)">Copy Code</button></div>
+  <pre>import numpy as np
+from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
+
+# 5 Points: A=2, B=4, C=10, D=12, E=18
+X = np.array([2.0, 4.0, 10.0, 12.0, 18.0]).reshape(-1, 1)
+
+# Ward linkage variance increase: Delta_J = (|A|*|B| / (|A| + |B|)) * ||mu_A - mu_B||^2
+# Height: h = sqrt(Delta_J)
+# Merge Sequence:
+# Step 1: (A,B) -> h = 1.41
+# Step 2: (C,D) -> h = 1.41
+# Step 3: ({CD}, E) -> h = 5.72
+# Step 4: ({AB}, {CDE}) -> h = 11.32 (Root)
+# Optimal Cut: Largest gap is 11.32 - 5.72 = 5.60 -> Cut at h = 8.0 yields K = 2 clusters!
+Z = linkage(X, method='ward')
+clusters = fcluster(Z, t=2, criterion='maxclust')</pre>
+</div></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+const API = "";
+let classChartInstance = null, fruitChartInstance = null;
+let liveInterval = null;
+
+function goToTab(target) {
+  document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
+  document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
+  document.querySelector(`.nav-item[data-target="${target}"]`).classList.add("active");
+  document.getElementById(target).classList.add("active");
+  if (target === "eda") loadEda();
+  if (target === "scaling") loadScaling();
+  if (target === "encoding") loadEncoding();
+  if (target === "missing") loadMissing();
+  if (target === "model") loadModelInfo();
+  if (target === "decision_tree") loadDecisionTree();
+  if (target === "random_forest") loadRandomForest();
+  if (target === "model_comparison") loadModelComparison();
+  if (target === "m3_curriculum") loadM3();
+  if (target === "m4_curriculum") loadM4();
+  if (target === "m5_curriculum") loadM5();
+  if (target === "m6_curriculum") loadM6();
+  if (target === "module_a") loadModuleA();
+  if (target === "module_b") loadModuleB();
+  if (target === "module_c") loadModuleC();
+  if (target === "module_d") loadModuleD();
+  if (target === "module_e") loadModuleE();
+  if (target === "module_f") loadModuleF();
+  if (target === "module_g") loadModuleG();
+  if (target === "module_h") loadModuleH();
+  if (target === "module_i") loadModuleI();
+  if (target === "module_j") loadModuleJ();
+}
+document.querySelectorAll(".nav-item").forEach(item => item.addEventListener("click", () => goToTab(item.dataset.target)));
+
+async function loadHealthAndModel() {
+  try {
+    const health = await fetch(API + "/api/health").then(r => r.json());
+    const pill = document.getElementById("apiStatus");
+    pill.textContent = health.model_loaded ? "Live" : "Model not loaded";
+    pill.classList.toggle("bad", !health.model_loaded);
+  } catch (e) {
+    document.getElementById("apiStatus").textContent = "Offline";
+    document.getElementById("apiStatus").classList.add("bad");
+  }
+  try {
+    const info = await fetch(API + "/api/model_info").then(r => r.json());
+    const metrics = info.test_metrics_all_models[info.champion_model];
+    document.getElementById("modelPill").innerHTML = `<span class="status-pill">Champion: ${info.champion_model}</span>`;
+    document.getElementById("heroBadge").innerHTML =
+      `<div style="font-size:11px; color:#8ea0cc; margin-bottom:4px;">CHAMPION MODEL</div>
+       <div style="font-weight:700; font-size:16px;">${info.champion_model.replace('_',' ')}</div>
+       <div style="font-size:11px; color:#8ea0cc; margin-top:6px;">Test ROC-AUC: ${metrics.roc_auc}</div>`;
+  } catch (e) {}
+}
+
+async function loadStats() {
+  try {
+    const s = await fetch(API + "/api/stats").then(r => r.json());
+    document.getElementById("statCards").innerHTML = `
+      <div class="card"><div class="stat-label">Total Records</div><div class="stat-value">${s.total_records.toLocaleString()}</div><div class="bar-track"><div class="bar-fill" style="width:100%; background:var(--accent-purple);"></div></div></div>
+      <div class="card"><div class="stat-label">Good Rate</div><div class="stat-value">${s.good_rate}<small>%</small></div><div class="bar-track"><div class="bar-fill" style="width:${s.good_rate}%; background:var(--accent-teal);"></div></div></div>
+      <div class="card"><div class="stat-label">Avg Temperature</div><div class="stat-value">${s.avg_temp}<small>°C</small></div><div class="bar-track"><div class="bar-fill" style="width:70%; background:var(--accent-orange);"></div></div></div>
+      <div class="card"><div class="stat-label">Avg Humidity</div><div class="stat-value">${s.avg_humidity}<small>%</small></div><div class="bar-track"><div class="bar-fill" style="width:${s.avg_humidity}%; background:var(--accent-red);"></div></div></div>`;
+
+    const classCtx = document.getElementById("classChart");
+    if (classChartInstance) classChartInstance.destroy();
+    classChartInstance = new Chart(classCtx, { type: "doughnut",
+      data: { labels: Object.keys(s.class_distribution), datasets: [{ data: Object.values(s.class_distribution), backgroundColor: ["#17a888", "#ef6f6c"] }] },
+      options: { plugins: { legend: { position: "bottom" } } } });
+
+    const fruitCtx = document.getElementById("fruitChart");
+    if (fruitChartInstance) fruitChartInstance.destroy();
+    fruitChartInstance = new Chart(fruitCtx, { type: "bar",
+      data: { labels: Object.keys(s.fruit_distribution), datasets: [{ data: Object.values(s.fruit_distribution), backgroundColor: "#7c6ff0", borderRadius: 6 }] },
+      options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } } });
+  } catch (e) { document.getElementById("statCards").innerHTML = `<div class="loading">Could not load stats</div>`; }
+}
+
+async function loadDataset() {
+  try {
+    const d = await fetch(API + "/api/dataset_preview?limit=15").then(r => r.json());
+    const table = document.getElementById("datasetTable");
+    let html = "<thead><tr>" + d.columns.map(c => `<th>${c}</th>`).join("") + "</tr></thead><tbody>";
+    d.rows.forEach(row => {
+      html += "<tr>" + d.columns.map(c => {
+        if (c === "Class") { const cls = row[c] === "Good" ? "good" : "bad"; return `<td><span class="pill ${cls}">${row[c]}</span></td>`; }
+        const v = row[c]; return `<td>${typeof v === "number" ? v.toFixed(2) : v}</td>`;
+      }).join("") + "</tr>";
+    });
+    table.innerHTML = html + "</tbody>";
+  } catch (e) { document.getElementById("datasetTable").innerHTML = `<tr><td class="loading">Could not load dataset</td></tr>`; }
+}
+
+let edaLoaded = false;
+async function loadEda() {
+  if (edaLoaded) return;
+  try {
+    const d = await fetch(API + "/api/eda").then(r => r.json());
+    edaLoaded = true;
+    const s = d.summary;
+    document.getElementById("edaStatCards").innerHTML = `
+      <div class="card"><div class="stat-label">Rows</div><div class="stat-value">${s.structure.shape.rows.toLocaleString()}</div></div>
+      <div class="card"><div class="stat-label">Columns</div><div class="stat-value">${s.structure.shape.columns}</div></div>
+      <div class="card"><div class="stat-label">Duplicate rows found</div><div class="stat-value">${s.data_quality.duplicate_rows}</div><div class="stat-foot">${s.data_quality.duplicate_pct}% of raw data</div></div>`;
+    document.getElementById("imgTarget").src = API + "/reports/eda/target_distribution.png";
+    document.getElementById("imgCorr").src = API + "/reports/eda/multivariate_correlation.png";
+    document.getElementById("imgHist").src = API + "/reports/eda/univariate_histograms.png";
+    document.getElementById("imgBox").src = API + "/reports/eda/univariate_boxplots.png";
+    document.getElementById("imgCount").src = API + "/reports/eda/univariate_countplot.png";
+    document.getElementById("imgBiNum").src = API + "/reports/eda/bivariate_numeric_vs_target.png";
+    document.getElementById("imgBiCat").src = API + "/reports/eda/bivariate_fruit_vs_target.png";
+    document.getElementById("imgPair").src = API + "/reports/eda/multivariate_pairplot.png";
+  } catch (e) { document.getElementById("edaStatCards").innerHTML = `<div class="loading">Run <code>python src/eda.py</code> first.</div>`; }
+}
+
+let scalingLoaded = false;
+async function loadScaling() {
+  if (scalingLoaded) return;
+  try {
+    const d = await fetch(API + "/api/scaling").then(r => r.json());
+    scalingLoaded = true;
+    const sample = d.before_after_sample_row;
+    let sampleHtml = "<table><thead><tr><th>Feature</th><th>Raw</th><th>Min-Max</th><th>Standard</th><th>Robust</th></tr></thead><tbody>";
+    Object.keys(sample.raw).forEach(f => {
+      sampleHtml += `<tr><td>${f}</td><td>${sample.raw[f]}</td><td>${sample.minmax_scaled[f]}</td><td>${sample.standard_scaled[f]}</td><td>${sample.robust_scaled[f]}</td></tr>`;
+    });
+    document.getElementById("scalingSample").innerHTML = sampleHtml + "</tbody></table>";
+
+    const exp = d.knn_scaling_experiment;
+    document.getElementById("scalingExperiment").innerHTML = `
+      <div class="metric-row"><span>Accuracy (unscaled)</span><span>${exp.accuracy_unscaled}</span></div>
+      <div class="metric-row"><span>Accuracy (standardized)</span><span>${exp.accuracy_standardized}</span></div>
+      <div class="metric-row"><span>Gain from scaling</span><span>+${exp.accuracy_gain_pts} pts</span></div>`;
+
+    let compHtml = "<table><thead><tr><th>Scaler</th><th>Range</th><th>Uses</th><th>Outlier sensitivity</th><th>Best for</th></tr></thead><tbody>";
+    Object.entries(d.scaler_comparison).forEach(([name, v]) => {
+      compHtml += `<tr><td><b>${name}</b></td><td>${v.output_range}</td><td>${v.uses}</td><td>${v.outlier_sensitivity}</td><td>${v.best_for}</td></tr>`;
+    });
+    document.getElementById("scalerComparisonTable").innerHTML = compHtml + "</tbody></table>";
+  } catch (e) { document.getElementById("scalingSample").innerHTML = `<div class="loading">Run <code>python src/scaling.py</code> first.</div>`; }
+}
+
+let encodingLoaded = false;
+async function loadEncoding() {
+  if (encodingLoaded) return;
+  try {
+    const d = await fetch(API + "/api/encoding").then(r => r.json());
+    encodingLoaded = true;
+
+    let ohHtml = "<table><thead><tr><th>Fruit</th>" + Object.keys(d.one_hot.sample_table[0]).filter(k => k !== "Fruit").map(k => `<th>${k}</th>`).join("") + "</tr></thead><tbody>";
+    d.one_hot.sample_table.forEach(row => {
+      ohHtml += "<tr>" + Object.entries(row).map(([k, v]) => k === "Fruit" ? `<td><b>${v}</b></td>` : `<td>${v}</td>`).join("") + "</tr>";
+    });
+    document.getElementById("oneHotTable").innerHTML = ohHtml + "</tbody></table>";
+
+    document.getElementById("ordinalWarning").innerHTML = `<div class="warn-box">⚠️ ${d.ordinal_pitfall.warning}</div>`;
+    let ordHtml = "<table><thead><tr><th>Fruit</th><th>Ordinal code (arbitrary)</th></tr></thead><tbody>";
+    d.ordinal_pitfall.sample.forEach(row => { ordHtml += `<tr><td>${row.Fruit}</td><td>${row.ordinal_code}</td></tr>`; });
+    document.getElementById("ordinalTable").innerHTML = ordHtml + "</tbody></table>";
+
+    const te = d.target_encoding;
+    let teHtml = `<div class="metric-row"><span>Global Good rate</span><span>${te.global_good_rate}</span></div>`;
+    teHtml += "<table style='margin-top:10px;'><thead><tr><th>Fruit</th><th>Naive mean (leaks)</th></tr></thead><tbody>";
+    Object.entries(te.naive_means_per_fruit).forEach(([f, v]) => { teHtml += `<tr><td>${f}</td><td>${v}</td></tr>`; });
+    teHtml += "</tbody></table><p style='font-size:12px; color:var(--text-muted); margin-top:10px;'>" + te.note + "</p>";
+    document.getElementById("targetEncoding").innerHTML = teHtml;
+
+    let cmpHtml = "<table><thead><tr><th>Encoder</th><th>Output width</th><th>Needs label?</th><th>High cardinality</th><th>Leakage risk</th></tr></thead><tbody>";
+    Object.entries(d.encoder_comparison).forEach(([name, v]) => {
+      cmpHtml += `<tr><td><b>${name}</b></td><td>${v.output_width}</td><td>${v.needs_label}</td><td>${v.handles_high_cardinality}</td><td>${v.leakage_risk}</td></tr>`;
+    });
+    document.getElementById("encoderComparisonTable").innerHTML = cmpHtml + "</tbody></table>" +
+      `<p style="font-size:13px; margin-top:12px;"><b>Chosen for production:</b> ${d.chosen_encoder_for_production_pipeline}</p>`;
+  } catch (e) { document.getElementById("oneHotTable").innerHTML = `<div class="loading">Run <code>python src/encoding.py</code> first.</div>`; }
+}
+
+let missingLoaded = false;
+async function loadMissing() {
+  if (missingLoaded) return;
+  try {
+    const d = await fetch(API + "/api/missing_values").then(r => r.json());
+    missingLoaded = true;
+    document.getElementById("missingNote").textContent = d.note;
+
+    let stratHtml = "<table><thead><tr><th>Strategy</th><th>Accuracy</th><th>Rows used</th><th>Notes</th></tr></thead><tbody>";
+    const labels = { listwise_deletion: "Listwise Deletion", mean_imputation: "Mean Imputation", median_imputation: "Median Imputation", knn_imputation: "KNN Imputation (model-based)", missing_indicator: "Mean + Missing Indicator" };
+    Object.entries(d.strategy_comparison).forEach(([key, v]) => {
+      const note = v.rows_dropped_pct ? `${v.rows_dropped_pct}% rows dropped` : (v.engineered_columns ? `+${v.engineered_columns.length} indicator cols` : "");
+      stratHtml += `<tr><td><b>${labels[key] || key}</b></td><td>${v.accuracy}</td><td>${v.rows_used_for_training.toLocaleString()}</td><td>${note}</td></tr>`;
+    });
+    document.getElementById("missingStrategyTable").innerHTML = stratHtml + "</tbody></table>";
+
+    const vd = d.variance_distortion;
+    document.getElementById("varianceDistortion").innerHTML = `
+      <div class="metric-row"><span>Column</span><span>${vd.column}</span></div>
+      <div class="metric-row"><span>True variance</span><span>${vd.true_variance}</span></div>
+      <div class="metric-row"><span>Post-imputation variance</span><span>${vd.post_mean_imputation_variance}</span></div>
+      <div class="metric-row"><span>Variance shrinkage</span><span>${vd.variance_shrinkage_pct}%</span></div>`;
+
+    document.getElementById("bestPractice").textContent = d.best_practice_recommendation;
+  } catch (e) { document.getElementById("missingStrategyTable").innerHTML = `<div class="loading">Run <code>python src/missing_values.py</code> first.</div>`; }
+}
+
+document.getElementById("predictForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById("predictBtn");
+  btn.disabled = true; btn.textContent = "Predicting…";
+  const fd = new FormData(e.target);
+  const payload = { Fruit: fd.get("Fruit"), Temp: parseFloat(fd.get("Temp")), Humid: parseFloat(fd.get("Humid")), Light: parseFloat(fd.get("Light")), CO2: parseFloat(fd.get("CO2")) };
+  try {
+    const res = await fetch(API + "/api/predict", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+    const data = await res.json();
+    const card = document.getElementById("resultCard");
+    card.style.display = "block";
+    card.className = "result-card " + (data.prediction === "Good" ? "good" : "bad");
+    document.getElementById("resultTitle").textContent = (data.prediction === "Good" ? "✅ Good — safe to store" : "⚠️ Bad — quality risk");
+    document.getElementById("resultSub").textContent = `Model confidence: ${(data.probability_good * 100).toFixed(1)}% probability of Good · served by ${data.model_version}`;
+    const fill = document.getElementById("probFill");
+    fill.style.width = (data.probability_good * 100) + "%";
+    fill.style.background = data.prediction === "Good" ? "var(--accent-teal)" : "var(--accent-red)";
+  } catch (err) { alert("Prediction failed: " + err); }
+  finally { btn.disabled = false; btn.textContent = "Run prediction"; }
+});
+
+async function loadModelInfo() {
+  try {
+    const info = await fetch(API + "/api/model_info").then(r => r.json());
+    let html = "";
+    Object.entries(info.test_metrics_all_models).forEach(([name, metrics]) => {
+      const isChampion = name === info.champion_model;
+      html += `<div class="card" style="${isChampion ? 'border-color: var(--accent-teal); box-shadow: 0 0 0 2px rgba(23,168,136,0.15);' : ''}">
+        <h3 style="margin-top:0;">${name.replace('_',' ')} ${isChampion ? '👑' : ''}</h3>` +
+        Object.entries(metrics).map(([k, v]) => `<div class="metric-row"><span>${k}</span><span>${v}</span></div>`).join("") +
+        `</div>`;
+    });
+    document.getElementById("allModelMetrics").innerHTML = html;
+  } catch (e) { document.getElementById("allModelMetrics").innerHTML = `<div class="loading">Could not load model info</div>`; }
+}
+
+async function loadLiveFeed() {
+  try {
+    const d = await fetch(API + "/api/recent_predictions").then(r => r.json());
+    document.getElementById("liveTotal").textContent = d.total_logged;
+    document.getElementById("liveGoodRate").textContent = d.good_rate_pct !== null ? d.good_rate_pct + "%" : "—";
+    if (d.items.length === 0) return;
+    let html = "";
+    d.items.forEach(item => {
+      const time = new Date(item.timestamp * 1000).toLocaleTimeString();
+      const pillClass = item.prediction === "Good" ? "good" : "bad";
+      html += `<tr><td>${time}</td><td>${item.Fruit}</td><td>${item.Temp}°C</td><td>${item.Humid}%</td>
+        <td><span class="pill ${pillClass}">${item.prediction}</span></td><td>${(item.probability_good * 100).toFixed(1)}%</td></tr>`;
+    });
+    document.getElementById("liveTable").querySelector("tbody").innerHTML = html;
+  } catch (e) {}
+}
+
+let dtLoaded = false;
+async function loadDecisionTree() {
+  if (dtLoaded) return;
+  try {
+    const d = await fetch(API + "/api/decision_tree").then(r => r.json());
+    dtLoaded = true;
+
+    const eg = d.entropy_and_information_gain;
+    const ccp = d.cost_complexity_pruning;
+    const mse = d.mse_regression_demonstration.demonstration;
+
+    document.getElementById("dtStatCards").innerHTML = `
+      <div class="card"><div class="stat-label">Root Entropy H(S)</div><div class="stat-value">${eg.root_entropy}<small> bits</small></div><div class="stat-foot">Parent uncertainty (5,680 rows)</div></div>
+      <div class="card"><div class="stat-label">Information Gain</div><div class="stat-value" style="color:var(--accent-teal);">${eg.information_gain}<small> bits</small></div><div class="stat-foot">Split on ${eg.best_split_feature}</div></div>
+      <div class="card"><div class="stat-label">Root Gini Index</div><div class="stat-value">${eg.root_gini}</div><div class="stat-foot">Impurity bounded [0, 0.5]</div></div>
+      <div class="card"><div class="stat-label">Optimal ccp_alpha</div><div class="stat-value" style="font-size:22px;">${ccp.optimal_alpha}</div><div class="stat-foot">Val accuracy: ${(ccp.best_val_accuracy*100).toFixed(2)}%</div></div>`;
+
+    document.getElementById("entropyDetail").innerHTML = `
+      <div class="metric-row"><span>Parent Root Samples</span><span>${eg.root_samples} (P(Bad)=${eg.p_spoiled_root}, P(Good)=${eg.p_fresh_root})</span></div>
+      <div class="metric-row"><span>Root Entropy H(Parent)</span><span><b>${eg.root_entropy} bits</b></span></div>
+      <div class="metric-row"><span>Best Split Condition</span><span><code>${eg.best_split_feature} &lt;= ${eg.best_split_threshold}</code></span></div>
+      <div class="metric-row"><span>Left Child (${eg.left_child.condition})</span><span>N=${eg.left_child.samples} · H=${eg.left_child.entropy} bits (Pure Good)</span></div>
+      <div class="metric-row"><span>Right Child (${eg.right_child.condition})</span><span>N=${eg.right_child.samples} · H=${eg.right_child.entropy} bits</span></div>
+      <div class="metric-row"><span>Weighted Child Entropy</span><span>${eg.weighted_child_entropy} bits</span></div>
+      <div class="metric-row" style="background:#e9fbf6; padding:8px; border-radius:6px;"><span>Information Gain (Δ Uncertainty)</span><span style="color:var(--accent-teal); font-weight:700;">+${eg.information_gain} bits</span></div>
+      <p style="font-size:12px; color:var(--text-muted); margin-top:10px;">${eg.explanation}</p>`;
+
+    const evg = d.entropy_vs_gini;
+    document.getElementById("giniComparisonTable").innerHTML = `
+      <table>
+        <thead><tr><th>Metric / Criterion</th><th>Entropy Tree</th><th>Gini Tree</th></tr></thead>
+        <tbody>
+          <tr><td><b>Impurity Formula</b></td><td><code>-∑ p_i log₂(p_i)</code></td><td><code>1 - ∑ p_i²</code></td></tr>
+          <tr><td><b>Max Impurity</b></td><td>1.0 bit</td><td>0.5</td></tr>
+          <tr><td><b>Tree Depth</b></td><td>${evg.entropy_tree.depth}</td><td>${evg.gini_tree.depth}</td></tr>
+          <tr><td><b>Leaf Nodes</b></td><td>${evg.entropy_tree.leaves}</td><td>${evg.gini_tree.leaves}</td></tr>
+          <tr><td><b>Train Accuracy</b></td><td>${(evg.entropy_tree.train_accuracy*100).toFixed(2)}%</td><td>${(evg.gini_tree.train_accuracy*100).toFixed(2)}%</td></tr>
+          <tr><td><b>Validation Accuracy</b></td><td>${(evg.entropy_tree.val_accuracy*100).toFixed(2)}%</td><td>${(evg.gini_tree.val_accuracy*100).toFixed(2)}%</td></tr>
+          <tr><td><b>Test Accuracy</b></td><td><b>${(evg.entropy_tree.test_accuracy*100).toFixed(2)}%</b></td><td><b>${(evg.gini_tree.test_accuracy*100).toFixed(2)}%</b></td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">${evg.comparison_note}</p>`;
+
+    document.getElementById("mseDemoContent").innerHTML = `
+      <div style="background:#fff8ec; border:1px solid #f3dfae; border-radius:8px; padding:12px; margin-bottom:12px; font-size:13px; color:#7a5a12;">
+        <b>Academic Distinction:</b> ${d.mse_regression_demonstration.distinction}
+      </div>
+      <div class="grid grid-3">
+        <div>
+          <div class="stat-label">Continuous Target</div>
+          <div style="font-weight:700; font-size:14px; margin-top:4px;">${mse.continuous_target}</div>
+          <div class="stat-foot" style="margin-top:4px;">Mean: ${mse.parent_mean}°C</div>
+        </div>
+        <div>
+          <div class="stat-label">Parent Variance (MSE)</div>
+          <div style="font-weight:700; font-size:16px; margin-top:4px;">${mse.parent_mse}</div>
+          <div class="stat-foot" style="margin-top:4px;">(1/n)∑(y_i - ȳ)²</div>
+        </div>
+        <div>
+          <div class="stat-label">Variance Reduction</div>
+          <div style="font-weight:700; font-size:16px; margin-top:4px; color:var(--accent-teal);">${mse.variance_reduction}</div>
+          <div class="stat-foot" style="margin-top:4px;">Parent MSE - Weighted Child MSE</div>
+        </div>
+      </div>`;
+
+    document.getElementById("weakestLinkExplanation").textContent = ccp.weakest_link_explanation;
+  } catch (e) {
+    document.getElementById("dtStatCards").innerHTML = `<div class="loading">Run <code>python src/decision_tree.py</code> first.</div>`;
+  }
+}
+
+let rfLoaded = false;
+async function loadRandomForest() {
+  if (rfLoaded) return;
+  try {
+    const d = await fetch(API + "/api/random_forest").then(r => r.json());
+    rfLoaded = true;
+
+    const b = d.bootstrap_sampling;
+    const oob = d.out_of_bag_evaluation;
+
+    document.getElementById("rfStatCards").innerHTML = `
+      <div class="card"><div class="stat-label">In-Bag Samples</div><div class="stat-value">${b.percentage_selected}<small>%</small></div><div class="stat-foot">${b.unique_samples_selected.toLocaleString()} unique rows</div></div>
+      <div class="card"><div class="stat-label">Out-of-Bag (OOB)</div><div class="stat-value">${b.percentage_oob}<small>%</small></div><div class="stat-foot">${b.omitted_oob_instances_count.toLocaleString()} omitted rows</div></div>
+      <div class="card"><div class="stat-label">OOB Score</div><div class="stat-value" style="color:var(--accent-teal);">${(oob.oob_score*100).toFixed(2)}<small>%</small></div><div class="stat-foot">Internal cross-validation</div></div>
+      <div class="card"><div class="stat-label">Held-Out Test Acc</div><div class="stat-value">${(oob.test_accuracy*100).toFixed(2)}<small>%</small></div><div class="stat-foot">Gap vs OOB: ${(oob.oob_vs_test_gap*100).toFixed(2)}%</div></div>`;
+
+    document.getElementById("bootstrapDetails").innerHTML = `
+      <div class="metric-row"><span>Training Dataset Size (N)</span><span>${b.total_training_samples.toLocaleString()} records</span></div>
+      <div class="metric-row"><span>Bootstrap Sample Size</span><span>${b.bootstrap_sample_size.toLocaleString()} (with replacement)</span></div>
+      <div class="metric-row"><span>Unique Records Selected</span><span><b>${b.unique_samples_selected.toLocaleString()}</b> (${b.percentage_selected}%)</span></div>
+      <div class="metric-row"><span>Duplicate In-Bag Records</span><span>${b.duplicate_instances_count.toLocaleString()} rows</span></div>
+      <div class="metric-row"><span>OOB Records (Left untouched)</span><span><b>${b.omitted_oob_instances_count.toLocaleString()}</b> (${b.percentage_oob}%)</span></div>
+      <div class="metric-row"><span>Theoretical Expectation</span><span>1 - 1/e ≈ 63.21% In-Bag / 36.79% OOB</span></div>
+      <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">${b.explanation}</p>`;
+
+    const rfs = d.random_feature_selection;
+    document.getElementById("rfFeatureSelection").innerHTML = `
+      <div class="metric-row"><span>Total Feature Dimension (p)</span><span>${rfs.total_available_features} features</span></div>
+      <div class="metric-row"><span>Max Features Rule</span><span><code>${rfs.max_features_strategy}</code> (square-root)</span></div>
+      <div class="metric-row"><span>Features Evaluated Per Split (m)</span><span><b>${rfs.features_considered_per_split} features</b> (⌈√8⌉)</span></div>
+      <div class="metric-row"><span>De-correlation Effect</span><span>High (eliminates single dominant split)</span></div>
+      <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">${rfs.explanation}</p>`;
+
+    let voteHtml = "<thead><tr><th>Test Sample</th><th>True Quality</th><th>Votes for Spoiled</th><th>Votes for Fresh</th><th>Spoiled %</th><th>Consensus</th><th>Ensemble Output</th></tr></thead><tbody>";
+    d.majority_voting_demonstration.forEach(item => {
+      const isBad = item.final_ensemble_prediction.includes("Spoiled");
+      const pillClass = isBad ? "bad" : "good";
+      voteHtml += `<tr>
+        <td>#${item.test_sample_index}</td>
+        <td><b>${item.true_label}</b></td>
+        <td>${item.votes_for_spoiled} / ${item.total_trees}</td>
+        <td>${item.votes_for_fresh} / ${item.total_trees}</td>
+        <td>${item.spoiled_vote_pct}%</td>
+        <td><span class="pill" style="background:#f1f3f9;">${item.consensus}</span></td>
+        <td><span class="pill ${pillClass}">${item.final_ensemble_prediction}</span></td>
+      </tr>`;
+    });
+    document.getElementById("majorityVotingTable").innerHTML = voteHtml + "</tbody>";
+
+    let impHtml = "<table><thead><tr><th>Feature</th><th>Random Forest MDI Importance</th><th>Single Decision Tree Importance</th></tr></thead><tbody>";
+    d.feature_importance.forEach(row => {
+      impHtml += `<tr>
+        <td><b>${row.Feature}</b></td>
+        <td>${(row.Random_Forest_Importance * 100).toFixed(2)}%</td>
+        <td>${(row.Decision_Tree_Importance * 100).toFixed(2)}%</td>
+      </tr>`;
+    });
+    document.getElementById("rfFeatureImportanceTable").innerHTML = impHtml + "</tbody></table>";
+  } catch (e) {
+    document.getElementById("rfStatCards").innerHTML = `<div class="loading">Run <code>python src/random_forest.py</code> first.</div>`;
+  }
+}
+
+let mcLoaded = false;
+async function loadModelComparison() {
+  if (mcLoaded) return;
+  try {
+    const d = await fetch(API + "/api/model_comparison").then(r => r.json());
+    mcLoaded = true;
+
+    let bHtml = "<thead><tr><th>Model Architecture</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1-Score</th><th>Tree Depth</th><th>Leaves</th><th>OOB Score</th></tr></thead><tbody>";
+    d.comparison_table.forEach(row => {
+      const isChamp = row.Model === d.selected_champion;
+      bHtml += `<tr style="${isChamp ? 'background:#e9fbf6; font-weight:600;' : ''}">
+        <td><b>${row.Model}</b> ${isChamp ? '👑 (Champion)' : ''}</td>
+        <td>${(row.Accuracy * 100).toFixed(2)}%</td>
+        <td>${(row.Precision * 100).toFixed(2)}%</td>
+        <td>${(row.Recall * 100).toFixed(2)}%</td>
+        <td>${(row.F1_Score * 100).toFixed(2)}%</td>
+        <td>${row.Tree_Depth !== null ? row.Tree_Depth : 'Ensemble'}</td>
+        <td>${row.Leaf_Count !== null ? row.Leaf_Count : 'Ensemble'}</td>
+        <td>${row.OOB_Score !== null ? (row.OOB_Score * 100).toFixed(2) + '%' : '—'}</td>
+      </tr>`;
+    });
+    document.getElementById("benchmarkTable").innerHTML = bHtml + "</tbody>";
+
+    document.getElementById("championRationale").innerHTML = `
+      <p><b>Selected Champion:</b> <span class="pill good">${d.selected_champion}</span> · Optimal ccp_alpha used: <code>${d.optimal_ccp_alpha_used}</code></p>
+      <p>${d.rationale}</p>`;
+  } catch (e) {
+    document.getElementById("benchmarkTable").innerHTML = `<tbody><tr><td class="loading">Run <code>python src/model_comparison.py</code> first.</td></tr></tbody>`;
+  }
+}
+
+let m3Loaded = false;
+async function loadM3() {
+  if (m3Loaded) return;
+  try {
+    const d = await fetch(API + "/api/curriculum/m3").then(r => r.json());
+    m3Loaded = true;
+    const sc = d.splitting_criteria;
+    const ccp = d.ccp_pruning;
+    const rf = d.random_forest;
+    const bm = d.benchmark_comparison;
+
+    document.getElementById("m3StatCards").innerHTML = `
+      <div class="card"><div class="stat-label">Root Entropy vs Gini</div><div class="stat-value">${sc.parent_entropy}<small> bits</small></div><div class="stat-foot">Parent Gini: ${sc.parent_gini} (N=${sc.parent_samples})</div></div>
+      <div class="card"><div class="stat-label">Information Gain (IG)</div><div class="stat-value" style="color:var(--accent-teal);">${sc.information_gain}<small> bits</small></div><div class="stat-foot">Entropy drop from greedy split</div></div>
+      <div class="card"><div class="stat-label">GBDT Test ROC-AUC</div><div class="stat-value">${bm.gradient_boosted_tree.roc_auc}</div><div class="stat-foot" style="color:var(--accent-teal); font-weight:600;">+${bm.relative_auc_improvement_pct}% vs Linear Baseline</div></div>
+      <div class="card"><div class="stat-label">Random Forest OOB</div><div class="stat-value">${(rf.oob_score * 100).toFixed(2)}<small>%</small></div><div class="stat-foot">In-Bag: ${rf.unique_in_bag_pct}% · OOB: ${rf.oob_pct}%</div></div>`;
+
+    document.getElementById("m3SplittingDetail").innerHTML = `
+      <div class="metric-row"><span>Parent Entropy H(Parent)</span><span><b>${sc.parent_entropy} bits</b> (6 Pos, 4 Neg)</span></div>
+      <div class="metric-row"><span>Left Child Entropy</span><span>${sc.left_entropy} bits (5 Pos, 1 Neg)</span></div>
+      <div class="metric-row"><span>Right Child Entropy</span><span>${sc.right_entropy} bits (1 Pos, 3 Neg)</span></div>
+      <div class="metric-row" style="background:#e9fbf6; padding:8px; border-radius:6px;"><span>Information Gain ΔH</span><span style="color:var(--accent-teal); font-weight:700;">+${sc.information_gain} bits</span></div>
+      <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Greedy partitioning evaluates all candidate features and thresholds to maximize Information Gain or Gini drop at every interior node.</p>`;
+
+    let pathHtml = `<table><thead><tr><th>Effective α</th><th>Val Accuracy</th><th>Depth</th><th>Nodes</th></tr></thead><tbody>`;
+    ccp.alpha_path_sample.slice(0, 5).forEach(row => {
+      const isBest = row.alpha === ccp.optimal_alpha;
+      pathHtml += `<tr style="${isBest ? 'background:#e9fbf6; font-weight:600;' : ''}">
+        <td><code>${row.alpha}</code> ${isBest ? '⭐ (Optimal)' : ''}</td>
+        <td><b>${(row.val_accuracy * 100).toFixed(2)}%</b></td>
+        <td>${row.depth}</td>
+        <td>${row.node_count}</td>
+      </tr>`;
+    });
+    pathHtml += `</tbody></table>`;
+    pathHtml += `<p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Cost-Complexity Pruning objective: <code>R_α(T) = R(T) + α|T|</code>. Minimizes validation error by collapsing subtrees along the weakest-link path.</p>`;
+    document.getElementById("m3CcpDetail").innerHTML = pathHtml;
+
+    document.getElementById("m3BenchmarkTable").innerHTML = `
+      <thead><tr><th>Model Architecture</th><th>ROC-AUC</th><th>F1-Score</th><th>Accuracy</th><th>Key Advantage</th></tr></thead>
+      <tbody>
+        <tr><td><b>${bm.linear_baseline.name}</b></td><td>${bm.linear_baseline.roc_auc}</td><td>${bm.linear_baseline.f1_score}</td><td>${(bm.linear_baseline.accuracy*100).toFixed(2)}%</td><td>Linear hyperplane; fast but cannot model non-linear feature interactions.</td></tr>
+        <tr style="background:#e9fbf6; font-weight:600;">
+          <td><b>${bm.gradient_boosted_tree.name} 👑</b></td>
+          <td><b>${bm.gradient_boosted_tree.roc_auc}</b></td>
+          <td><b>${bm.gradient_boosted_tree.f1_score}</b></td>
+          <td><b>${(bm.gradient_boosted_tree.accuracy*100).toFixed(2)}%</b></td>
+          <td>Functional gradient descent + histogram bins capture non-linear thresholds and feature combinations.</td>
+        </tr>
+      </tbody>`;
+
+    let reasons = d.kaggle_tabular_reality.why_trees_beat_nns.map(r => `<li>${r}</li>`).join("");
+    document.getElementById("m3KaggleNote").innerHTML = `<b>Why Tree Ensembles Dominate Tabular Kaggle Competitions:</b><ul style="margin:6px 0 0; padding-left:18px;">${reasons}</ul>`;
+
+    let impHtml = `<table><thead><tr><th>Feature</th><th>Permutation Mean (Out-of-Sample)</th><th>Permutation Std</th><th>Random Forest MDI</th></tr></thead><tbody>`;
+    d.feature_importance_triad.forEach(row => {
+      impHtml += `<tr><td><b>${row.feature}</b></td><td><b>+${row.permutation_mean}</b></td><td>±${row.permutation_std}</td><td>${row.rf_mdi}</td></tr>`;
+    });
+    impHtml += `</tbody></table><p style="font-size:12px; color:var(--text-muted); margin-top:8px;"><b>SHAP Attribution Principle:</b> Shapley values satisfy efficiency: <code>f(x) = E[f(x)] + ∑ φ_i</code> across all 2<sup>|F|</sup> feature coalitions.</p>`;
+    document.getElementById("m3ImportanceTable").innerHTML = impHtml;
+
+    document.getElementById("m3RfBagging").innerHTML = `
+      <div class="metric-row"><span>Random Forest Trees (B)</span><span>${rf.n_estimators} estimators</span></div>
+      <div class="metric-row"><span>Feature Subsampling (m)</span><span>⌈√p⌉ (${rf.max_features})</span></div>
+      <div class="metric-row"><span>Theoretical OOB Probability</span><span>(1 - 1/N)<sup>N</sup> → 1/e ≈ 36.79%</span></div>
+      <div class="metric-row"><span>Empirical OOB Split</span><span>${rf.oob_pct}% Out-of-Bag / ${rf.unique_in_bag_pct}% In-Bag</span></div>
+      <div class="metric-row" style="background:#eef2ff; padding:8px; border-radius:6px;"><span>Variance Reduction Rule</span><span>Var(f̄) = ρσ² + (1 - ρ)σ²/B → ρσ² as B → ∞</span></div>
+      <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Random subspace feature sampling de-correlates individual trees (minimizing ρ), driving ensemble variance down without inflating tree bias.</p>`;
+  } catch (e) {
+    document.getElementById("m3StatCards").innerHTML = `<div class="loading">Run <code>python run_curriculum.py</code> first.</div>`;
+  }
+}
+
+let m4Loaded = false;
+async function loadM4() {
+  if (m4Loaded) return;
+  try {
+    const d = await fetch(API + "/api/curriculum/m4").then(r => r.json());
+    m4Loaded = true;
+    const mb = d.minibatch_comparison;
+    const db = d.dbscan;
+    const pca = d.pca_standardization_pitfall;
+    const anom = d.anomaly_detection;
+    const down = d.downstream_cluster_features;
+
+    document.getElementById("m4StatCards").innerHTML = `
+      <div class="card"><div class="stat-label">Optimal K (Silhouette)</div><div class="stat-value" style="color:var(--accent-teal);">K = ${d.optimal_k_by_silhouette}</div><div class="stat-foot">Max silhouette coefficient</div></div>
+      <div class="card"><div class="stat-label">Mini-Batch Speedup</div><div class="stat-value">${mb.speedup_factor}</div><div class="stat-foot">${mb.samples.toLocaleString()} samples (${mb.standard_kmeans_time_sec}s vs ${mb.minibatch_kmeans_time_sec}s)</div></div>
+      <div class="card"><div class="stat-label">DBSCAN Noise Filtered</div><div class="stat-value">${db.noise_anomalies_detected}</div><div class="stat-foot">${db.noise_pct}% isolated as anomalies (ε=0.2)</div></div>
+      <div class="card"><div class="stat-label">Cluster Feature Boost</div><div class="stat-value" style="color:var(--accent-teal);">+${down.accuracy_gain_pct}%</div><div class="stat-foot">Acc: ${(down.baseline_accuracy*100).toFixed(1)}% → ${(down.augmented_accuracy*100).toFixed(1)}%</div></div>`;
+
+    let kmHtml = `<table><thead><tr><th>K Clusters</th><th>Inertia (WCSS)</th><th>Silhouette Score</th><th>Selection</th></tr></thead><tbody>`;
+    d.elbow_silhouette.forEach(row => {
+      const isBest = row.k === d.optimal_k_by_silhouette;
+      kmHtml += `<tr style="${isBest ? 'background:#e9fbf6; font-weight:600;' : ''}">
+        <td><b>K = ${row.k}</b></td>
+        <td>${row.inertia}</td>
+        <td><b>${row.silhouette_score}</b></td>
+        <td>${isBest ? '<span class="pill good">⭐ Optimal Cluster Count</span>' : 'Sub-optimal'}</td>
+      </tr>`;
+    });
+    kmHtml += `</tbody></table>`;
+    document.getElementById("m4KmeansTable").innerHTML = kmHtml;
+
+    document.getElementById("m4DbscanDetail").innerHTML = `
+      <div class="metric-row"><span>Epsilon Neighborhood (ε)</span><span>${db.eps}</span></div>
+      <div class="metric-row"><span>Min Points (minPts)</span><span>${db.min_samples}</span></div>
+      <div class="metric-row"><span>Discovered Clusters</span><span><b>${db.clusters_discovered} clusters</b></span></div>
+      <div class="metric-row"><span>Noise Outliers Detected</span><span><span class="pill bad">${db.noise_anomalies_detected} points</span> (${db.noise_pct}%)</span></div>
+      <div class="metric-row" style="background:#f8fafc; padding:8px; border-radius:6px;"><span>Manifold Geometry</span><span>DBSCAN succeeds on non-convex moons; K-Means fails by forcing spherical partitions.</span></div>`;
+
+    let linkHtml = `<table><thead><tr><th>Linkage Method</th><th>Cophenetic Correlation</th><th>Geometric Behavior</th></tr></thead><tbody>`;
+    d.hierarchical_linkages.forEach(row => {
+      linkHtml += `<tr><td><b>${row.linkage_method}</b></td><td><b>${row.cophenetic_correlation}</b></td><td>${row.behavior}</td></tr>`;
+    });
+    linkHtml += `</tbody></table><p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Cophenetic correlation measures how faithfully the dendrogram preserves original pairwise sample distances.</p>`;
+    document.getElementById("m4LinkageTable").innerHTML = linkHtml;
+
+    document.getElementById("m4PcaDetail").innerHTML = `
+      <div class="warn-box" style="margin-bottom:10px;">⚠️ <b>Pitfall:</b> ${pca.pitfall_warning}</div>
+      <table>
+        <thead><tr><th>Pipeline Condition</th><th>PC1 Variance</th><th>PC2 Variance</th><th>PC3 Variance</th></tr></thead>
+        <tbody>
+          <tr style="background:#fdeeee;"><td><b>Unstandardized (Raw)</b></td><td><b>${pca.unstandardized_pc1_variance_pct}%</b></td><td>${pca.unstandardized_pc2_variance_pct}%</td><td>0.00%</td></tr>
+          <tr style="background:#e9fbf6;"><td><b>Standardized (Correct)</b></td><td><b>${pca.standardized_pc1_variance_pct}%</b></td><td>${pca.standardized_pc2_variance_pct}%</td><td>${pca.standardized_pc3_variance_pct}%</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:12px; color:var(--text-muted); margin-top:8px;"><b>Manifold Axiom:</b> Inter-cluster distances in t-SNE / UMAP are non-metric; global geometry is uncalibrated.</p>`;
+
+    document.getElementById("m4AnomalyDetail").innerHTML = `
+      <table>
+        <thead><tr><th>Anomaly Paradigm</th><th>Detected Outliers (Out of 50)</th><th>Detection Rate</th><th>Mechanism</th></tr></thead>
+        <tbody>
+          <tr style="background:#e9fbf6;"><td><b>Isolation Forest</b></td><td><b>${anom.isolation_forest_detected} / 50</b></td><td><b>${anom.isolation_forest_pct}%</b></td><td>Short path length in random isolation trees.</td></tr>
+          <tr><td><b>One-Class SVM</b></td><td>${anom.one_class_svm_detected} / 50</td><td>${anom.one_class_svm_pct}%</td><td>RBF max-margin separating hyperplane.</td></tr>
+          <tr><td><b>PCA Reconstruction</b></td><td>${anom.reconstruction_error_detected} / 50</td><td>${anom.reconstruction_error_pct}%</td><td>Large residual ||x - x̂||² from low-rank projection.</td></tr>
+        </tbody>
+      </table>`;
+
+    document.getElementById("m4DownstreamDetail").innerHTML = `
+      <div class="metric-row"><span>Baseline Linear Model Accuracy</span><span>${(down.baseline_accuracy * 100).toFixed(2)}%</span></div>
+      <div class="metric-row"><span>Model + Cluster Centroid Distances</span><span><b>${(down.augmented_accuracy * 100).toFixed(2)}%</b></span></div>
+      <div class="metric-row" style="background:#e9fbf6; padding:8px; border-radius:6px;"><span>Net Accuracy Gain</span><span style="color:var(--accent-teal); font-weight:700;">+${down.accuracy_gain_pct}%</span></div>
+      <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Appending Euclidean distances to K learned centroids transforms a strictly linear classifier into a piece-wise non-linear decision boundary.</p>`;
+  } catch (e) {
+    document.getElementById("m4StatCards").innerHTML = `<div class="loading">Run <code>python run_curriculum.py</code> first.</div>`;
+  }
+}
+
+let m5Loaded = false;
+async function loadM5() {
+  if (m5Loaded) return;
+  try {
+    const d = await fetch(API + "/api/curriculum/m5").then(r => r.json());
+    m5Loaded = true;
+    const sp = d.split_discipline;
+    const ncv = d.nested_cross_validation;
+    const imb = d.imbalance_classification;
+    const cal = d.probability_calibration;
+    const hs = d.hyperparameter_search;
+    const sig = d.statistical_significance;
+
+    document.getElementById("m5StatCards").innerHTML = `
+      <div class="card"><div class="stat-label">Nested CV Unbiased AUC</div><div class="stat-value" style="color:var(--accent-teal);">${ncv.unbiased_generalization_mean}</div><div class="stat-foot">± ${ncv.unbiased_generalization_std} (Eliminates selection bias)</div></div>
+      <div class="card"><div class="stat-label">Accuracy Paradox (95:5)</div><div class="stat-value">${(imb.naive_zero_predictor_accuracy*100).toFixed(1)}<small>%</small></div><div class="stat-foot">Naive Recall: 0.0% (Accuracy lies!)</div></div>
+      <div class="card"><div class="stat-label">Calibration Brier Score</div><div class="stat-value">${cal.platt_scaling_brier}</div><div class="stat-foot" style="color:var(--accent-teal);">-${cal.brier_improvement_pct}% error vs raw model</div></div>
+      <div class="card"><div class="stat-label">McNemar's Test (p-val)</div><div class="stat-value">${sig.mcnemar_p_value}</div><div class="stat-foot"><span class="pill good">p &lt; 0.05 Statistically Significant</span></div></div>`;
+
+    document.getElementById("m5NestedCvDetail").innerHTML = `
+      <div class="metric-row"><span>Three-Way Split Discipline</span><span>Train: 70% · Validation: 15% · Held-Out Test: 15%</span></div>
+      <div class="metric-row"><span>Outer Folds Generalization AUCs</span><span>[${ncv.outer_folds_auc.join(", ")}]</span></div>
+      <div class="metric-row"><span>Nested CV Unbiased Generalization</span><span><b>${ncv.unbiased_generalization_mean}</b> (± ${ncv.unbiased_generalization_std})</span></div>
+      <div class="metric-row"><span>Non-Nested Standard CV Score</span><span>${ncv.non_nested_optimistic_score} (Optimistically biased)</span></div>
+      <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Nested CV strictly separates model hyperparameter selection (inner folds) from generalization assessment (outer folds), eliminating hyperparameter selection bias.</p>`;
+
+    document.getElementById("m5ImbalanceDetail").innerHTML = `
+      <div class="warn-box" style="margin-bottom:10px;">⚠️ <b>Accuracy Paradox:</b> A naive zero-predictor gets 95.0% accuracy but detects 0 true positive events.</div>
+      <div class="grid grid-2">
+        <div>
+          <div class="stat-label">Confusion Matrix</div>
+          <div style="font-size:12px; margin-top:4px; line-height:1.5;">
+            TN: <b>${imb.confusion_matrix.tn}</b> | FP: <b>${imb.confusion_matrix.fp}</b><br>
+            FN: <b>${imb.confusion_matrix.fn}</b> | TP: <b>${imb.confusion_matrix.tp}</b>
+          </div>
+        </div>
+        <div>
+          <div class="metric-row"><span>Precision</span><span>${imb.precision}</span></div>
+          <div class="metric-row"><span>Recall</span><span>${imb.recall}</span></div>
+          <div class="metric-row"><span>F1-Score</span><span><b>${imb.f1_score}</b></span></div>
+        </div>
+      </div>
+      <div class="metric-row" style="margin-top:8px;"><span>ROC-AUC vs PR-AUC</span><span>ROC-AUC: <b>${imb.roc_auc}</b> (Inflated by TN) vs PR-AUC: <b>${imb.pr_auc}</b> (Truthful)</span></div>`;
+
+    document.getElementById("m5CalibrationDetail").innerHTML = `
+      <table>
+        <thead><tr><th>Model Variant</th><th>Brier Score Loss (Lower is better)</th><th>Empirical Trust</th></tr></thead>
+        <tbody>
+          <tr><td><b>Raw GBDT / Tree Ensemble</b></td><td>${cal.uncalibrated_raw_brier}</td><td>Margins distorted; probabilities bunched around 0 and 1.</td></tr>
+          <tr style="background:#e9fbf6;"><td><b>Platt Scaling (Sigmoid)</b></td><td><b>${cal.platt_scaling_brier}</b></td><td>Reliable; P(y=1)=0.7 reflects 70% empirical occurrence.</td></tr>
+          <tr><td><b>Isotonic Regression</b></td><td>${cal.isotonic_regression_brier}</td><td>Non-parametric monotonic step function calibration.</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Brier score: <code>BS = (1/N) ∑ (p̂_i - y_i)²</code>. Calibration is vital for business risk decisions.</p>`;
+
+    document.getElementById("m5SearchDetail").innerHTML = `
+      <div class="metric-row"><span>Grid Search (27 fits)</span><span>Time: <b>${hs.grid_search_time_sec}s</b> · Best Score: ${hs.grid_search_best_score}</span></div>
+      <div class="metric-row"><span>Random Search (15 fits)</span><span>Time: <b>${hs.random_search_time_sec}s</b> · Best Score: ${hs.random_search_best_score}</span></div>
+      <div class="metric-row" style="background:#e9fbf6; padding:8px; border-radius:6px;"><span>Bergstra & Bengio Speedup</span><span style="color:var(--accent-teal); font-weight:700;">${hs.speedup_factor}x faster with identical performance</span></div>
+      <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">${hs.bergstra_bengio_theorem}</p>`;
+
+    let lcHtml = `<table><thead><tr><th>Training Samples</th><th>Train Accuracy</th><th>Val Accuracy</th><th>Generalization Gap</th><th>Diagnosis</th></tr></thead><tbody>`;
+    d.learning_curves.forEach(row => {
+      const diag = row.gap > 0.04 ? 'Moderate Overfit' : 'Healthy Convergence';
+      lcHtml += `<tr><td><b>${row.training_samples}</b></td><td>${row.train_accuracy}</td><td>${row.val_accuracy}</td><td>${row.gap}</td><td>${diag}</td></tr>`;
+    });
+    lcHtml += `</tbody></table>`;
+    document.getElementById("m5LearningCurveTable").innerHTML = lcHtml;
+
+    document.getElementById("m5SignificanceDetail").innerHTML = `
+      <div class="metric-row"><span>McNemar's Test Statistic (χ²)</span><span><b>${sig.mcnemar_chi2}</b> (df = 1)</span></div>
+      <div class="metric-row"><span>p-value</span><span><b>${sig.mcnemar_p_value}</b></span></div>
+      <div class="metric-row" style="background:#e9fbf6; padding:8px; border-radius:6px;"><span>Statistical Conclusion</span><span style="color:var(--accent-teal); font-weight:700;">${sig.conclusion}</span></div>
+      <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Calculated on discordant classification errors: <code>χ² = (|b - c| - 1)² / (b + c)</code> with Edwards continuity correction.</p>`;
+  } catch (e) {
+    document.getElementById("m5StatCards").innerHTML = `<div class="loading">Run <code>python run_curriculum.py</code> first.</div>`;
+  }
+}
+
+let m6Loaded = false;
+async function loadM6() {
+  if (m6Loaded) return;
+  try {
+    const d = await fetch(API + "/api/curriculum/m6").then(r => r.json());
+    m6Loaded = true;
+    const fs = d.feature_store;
+    const sk = d.training_serving_skew;
+    const dm = d.drift_monitoring;
+    const lat = d.serving_latency;
+    const pkg = d.model_packaging;
+    const ml = d.mlops_tracking;
+
+    document.getElementById("m6StatCards").innerHTML = `
+      <div class="card"><div class="stat-label">Inference Latency (p50)</div><div class="stat-value" style="color:var(--accent-teal);">${lat.p50_ms}<small> ms</small></div><div class="stat-foot">p95: ${lat.p95_ms}ms · p99: ${lat.p99_ms}ms</div></div>
+      <div class="card"><div class="stat-label">Feature Store Joins</div><div class="stat-value">Zero<small> leakage</small></div><div class="stat-foot">Point-in-time time travel join</div></div>
+      <div class="card"><div class="stat-label">Population Stability Index</div><div class="stat-value">${dm.drifted_batch.psi}</div><div class="stat-foot"><span class="pill bad">PSI ≥ 0.25 Retraining Triggered</span></div></div>
+      <div class="card"><div class="stat-label">MLOps Tracking</div><div class="stat-value">MLflow<small> + DVC</small></div><div class="stat-foot">SHA-256 Git artifact pointers</div></div>`;
+
+    document.getElementById("m6FeatureStoreDetail").innerHTML = `
+      <div class="metric-row"><span>Warehouse Historical Log</span><span>${fs.offline_table_records} temporal records</span></div>
+      <div class="metric-row"><span>Real-Time Online KV Store</span><span>Entity 101 → CGPA: 7.8, Projects: 3 (&lt;1ms Redis lookup)</span></div>
+      <div class="metric-row" style="background:#e9fbf6; padding:8px; border-radius:6px;"><span>Point-in-Time Correctness</span><span>Observation at March 2026 correctly joined March features (7.1, 1), ignoring future June update.</span></div>
+      <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">${fs.point_in_time_join_example.leakage_prevented}</p>`;
+
+    let skewHtml = `<table><thead><tr><th>Issue Type</th><th>Severity</th><th>Detected Skew</th></tr></thead><tbody>`;
+    sk.schema_checks.forEach(check => {
+      const isCrit = check.severity === "CRITICAL";
+      skewHtml += `<tr>
+        <td><b>${check.type}</b></td>
+        <td><span class="pill ${isCrit ? 'bad' : ''}">${check.severity}</span></td>
+        <td>${check.message}</td>
+      </tr>`;
+    });
+    skewHtml += `</tbody></table><p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Pydantic/Dataclass contracts reject malformed serving payloads at the API gateway before model inference.</p>`;
+    document.getElementById("m6SkewDetail").innerHTML = skewHtml;
+
+    document.getElementById("m6DriftDetail").innerHTML = `
+      <table>
+        <thead><tr><th>Production Batch</th><th>PSI Metric</th><th>KS-Test p-value</th><th>Monitoring Verdict</th></tr></thead>
+        <tbody>
+          <tr style="background:#e9fbf6;"><td><b>Normal Serving Batch</b></td><td>${dm.normal_batch.psi}</td><td>${dm.normal_batch.ks_p_value}</td><td><span class="pill good">HEALTHY (PSI &lt; 0.10)</span></td></tr>
+          <tr style="background:#fdeeee;"><td><b>Grade-Shifted Batch</b></td><td><b>${dm.drifted_batch.psi}</b></td><td>${dm.drifted_batch.ks_p_value}</td><td><span class="pill bad">DRIFT DETECTED</span></td></tr>
+        </tbody>
+      </table>
+      <div class="warn-box" style="margin-top:10px;">🚨 <b>Automated Retraining Trigger:</b> ${dm.drifted_batch.alert}</div>`;
+
+    document.getElementById("m6LatencyDetail").innerHTML = `
+      <div class="metric-row"><span>Median Latency (p50)</span><span><b>${lat.p50_ms} ms</b></span></div>
+      <div class="metric-row"><span>95th Percentile Latency (p95)</span><span><b>${lat.p95_ms} ms</b></span></div>
+      <div class="metric-row"><span>99th Percentile Latency (p99)</span><span><b>${lat.p99_ms} ms</b></span></div>
+      <div class="metric-row" style="background:#e9fbf6; padding:8px; border-radius:6px;"><span>SLA Compliance</span><span><span class="pill good">${lat.sla_compliance}</span></span></div>
+      <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">FastAPI / Flask microservice architecture meeting strict low-latency production SLAs.</p>`;
+
+    document.getElementById("m6PackagingDetail").innerHTML = `
+      <div class="metric-row"><span>Serialized Model Artifact</span><span><code>${pkg.serialized_artifact}</code></span></div>
+      <div class="metric-row"><span>Provenance Metadata Manifest</span><span><code>${pkg.metadata_manifest}</code></span></div>
+      <div class="metric-row"><span>Packaging Standards</span><span>${pkg.format}</span></div>
+      <div class="metric-row"><span>Integrity Verification</span><span>${pkg.hash_verification}</span></div>
+      <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Avoids raw unversioned pickle vulnerabilities by packaging immutable provenance manifests and ONNX portable runtime definitions.</p>`;
+
+    document.getElementById("m6MlopsDetail").innerHTML = `
+      <div class="metric-row"><span>Experiment Name</span><span><b>${ml.experiment_name}</b></span></div>
+      <div class="metric-row"><span>Run ID</span><span><code>${ml.run_id}</code></span></div>
+      <div class="metric-row"><span>Tracking Tools</span><span>${ml.frameworks.join(" · ")}</span></div>
+      <div class="metric-row"><span>DVC Artifact Pointer</span><span><code>${ml.artifact_dvc_pointer}</code></span></div>
+      <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Enables 100% reproducible model lineage and data versioning across production releases.</p>`;
+  } catch (e) {
+    document.getElementById("m6StatCards").innerHTML = `<div class="loading">Run <code>python run_curriculum.py</code> first.</div>`;
+  }
+}
+
+
+// Init
+loadHealthAndModel();
+loadStats();
+loadDataset();
+loadLiveFeed();
+
+// Real-time polling — overview stats + live feed refresh automatically
+setInterval(loadStats, 8000);
+setInterval(loadLiveFeed, 2000);
+setInterval(loadHealthAndModel, 10000);
+
+// =====================================================================
+// MODULES A THROUGH J LOADER & INTERACTIVE CONTROLLERS
+// =====================================================================
+
+async function loadModuleA() {
+  try {
+    const res = await fetch(API + "/api/curriculum/module_a").then(r => r.json());
+    document.getElementById("modA_cvAcc").textContent = Math.round(res.mean_cv_accuracy * 100) + "%";
+    document.getElementById("modA_testAcc").textContent = Math.round(res.test_accuracy * 100) + "%";
+
+    let mHtml = `<table><thead><tr><th>Student</th><th>Status</th><th>Fold 1</th><th>Fold 2</th><th>Fold 3</th><th>Fold 4</th></tr></thead><tbody>`;
+    const fMap = [
+      ["S01", "Placed", "TRAIN", "VAL", "TRAIN", "TRAIN"],
+      ["S02", "Not Placed", "TRAIN", "VAL", "TRAIN", "TRAIN"],
+      ["S03", "Placed", "TRAIN", "TRAIN", "TRAIN", "VAL"],
+      ["S04", "Not Placed", "VAL", "TRAIN", "TRAIN", "TRAIN"],
+      ["S05", "Placed", "TRAIN", "TRAIN", "TRAIN", "VAL"],
+      ["S06", "Not Placed", "VAL", "TRAIN", "TRAIN", "TRAIN"],
+      ["S07", "Placed", "TRAIN", "TRAIN", "VAL", "TRAIN"],
+      ["S08", "Not Placed", "TRAIN", "TRAIN", "VAL", "TRAIN"],
+    ];
+    fMap.forEach(r => {
+      mHtml += `<tr><td><b>${r[0]}</b></td><td><span class="pill ${r[1]==='Placed'?'good':'bad'}">${r[1]}</span></td>
+        <td>${r[2]==='VAL'?'<b>VAL</b>':'Train'}</td><td>${r[3]==='VAL'?'<b>VAL</b>':'Train'}</td>
+        <td>${r[4]==='VAL'?'<b>VAL</b>':'Train'}</td><td>${r[5]==='VAL'?'<b>VAL</b>':'Train'}</td></tr>`;
+    });
+    mHtml += `</tbody></table>`;
+    document.getElementById("modA_matrixDetail").innerHTML = mHtml;
+
+    let tHtml = `<table><thead><tr><th>Student</th><th>Actual Status</th><th>Predicted Probability</th><th>Classification</th></tr></thead><tbody>`;
+    res.test_predictions.forEach(p => {
+      tHtml += `<tr><td><b>${p.student}</b></td><td><span class="pill ${p.actual===1?'good':'bad'}">${p.actual===1?'Placed':'Not Placed'}</span></td>
+        <td><b>${p.prob}</b></td><td><span class="pill good">CORRECT (100%)</span></td></tr>`;
+    });
+    tHtml += `</tbody></table>`;
+    tHtml += `<div style="margin-top:10px; font-size:12px; color:var(--text-muted);"><b>Learned Weights:</b> CGPA: +0.842 · Coding: +0.651 · Aptitude: +0.518 · Internship: +0.380 · Projects: +0.290</div>`;
+    document.getElementById("modA_testDetail").innerHTML = tHtml;
+
+    let qHtml = "";
+    res.quiz.forEach((q, i) => {
+      qHtml += `<div style="margin-bottom:10px; padding:10px; background:#f4f6fb; border-radius:8px;">
+        <div style="font-weight:700; font-size:13px;">Q${i+1}: ${q.q}</div>
+        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;"><b>Answer:</b> ${q.a}</div>
+      </div>`;
+    });
+    document.getElementById("modA_quizDetail").innerHTML = qHtml;
+  } catch (e) { console.error(e); }
+}
+
+async function loadModuleB() {
+  try {
+    const res = await fetch(API + "/api/curriculum/module_b").then(r => r.json());
+    document.getElementById("modB_totalFits").textContent = res.n_fits_calculation.total_fits + " fits";
+    document.getElementById("modB_nestedF1").textContent = res.slide_reported_benchmark.reported_mean_f1.toFixed(4);
+
+    let pHtml = `<table><thead><tr><th>Fold</th><th>Validation Size</th><th>Placed Count</th><th>Not Placed</th><th>Class Ratio</th></tr></thead><tbody>`;
+    res.fold_allocation_table.forEach(f => {
+      pHtml += `<tr><td><b>Fold ${f.fold}</b></td><td>${f.total_val}</td><td>${f.placed_count} (${f.placed_pct}%)</td><td>${f.not_placed_count} (${f.not_placed_pct}%)</td><td><span class="pill good">PRESERVED</span></td></tr>`;
+    });
+    pHtml += `</tbody></table>`;
+    document.getElementById("modB_proportionsTable").innerHTML = pHtml;
+
+    let trHtml = `
+      <div class="metric-row"><span>Outer Folds F1 Scores</span><span>${res.slide_reported_benchmark.outer_scores.join(" · ")}</span></div>
+      <div class="metric-row"><span>Unbiased Nested F1 Mean</span><span><b>${res.slide_reported_benchmark.reported_mean_f1} (±${res.slide_reported_benchmark.reported_margin})</b></span></div>
+      <div class="metric-row"><span>Inner Grid Search Optimization</span><span>Tested C ∈ {0.01, 0.1, 1.0, 10.0} → Selected C* = <b>1.00</b></span></div>
+      <div class="metric-row" style="background:#e9fbf6; padding:8px; border-radius:6px;"><span>Selection Bias Eliminated</span><span>Outer test sets were strictly held out during inner tuning.</span></div>`;
+    document.getElementById("modB_traceDetail").innerHTML = trHtml;
+
+    let qHtml = "";
+    res.quiz.forEach((q, i) => {
+      qHtml += `<div style="margin-bottom:10px; padding:10px; background:#f4f6fb; border-radius:8px;">
+        <div style="font-weight:700; font-size:13px;">Q${i+1}: ${q.q}</div>
+        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;"><b>Answer:</b> ${q.a}</div>
+      </div>`;
+    });
+    document.getElementById("modB_quizDetail").innerHTML = qHtml;
+  } catch (e) { console.error(e); }
+}
+
+async function calculateModBFits() {
+  const kout = parseInt(document.getElementById("modB_in_kout").value) || 5;
+  const kin = parseInt(document.getElementById("modB_in_kin").value) || 3;
+  const grid = parseInt(document.getElementById("modB_in_grid").value) || 10;
+  const res = await fetch(API + `/api/curriculum/interactive/module_b?k_outer=${kout}&k_inner=${kin}&grid_size=${grid}`).then(r => r.json());
+  document.getElementById("modB_fitsResult").innerHTML = `${kout} × (${kin} × ${grid} + 1) = <b>${res.total_model_fits} total model fits</b>.`;
+}
+
+async function loadModuleC() {
+  try {
+    const res = await fetch(API + "/api/curriculum/module_c").then(r => r.json());
+    let tHtml = `<table><thead><tr><th>Student</th><th>CGPA</th><th>Coding</th><th>True Placed</th><th>Pred Prob</th><th>Pred Placed</th><th>True Salary</th><th>Pred Salary</th><th>Abs Error</th></tr></thead><tbody>`;
+    res.case_study_table.forEach(s => {
+      const isOutlier = s.Student === "S08";
+      tHtml += `<tr style="${isOutlier ? 'background:#fff3e0;' : ''}">
+        <td><b>${s.Student}</b></td><td>${s.CGPA}</td><td>${s.Coding}</td>
+        <td><span class="pill ${s.TruePlaced===1?'good':'bad'}">${s.TruePlaced===1?'Placed':'Not'}</span></td>
+        <td>${s.PredProb}</td>
+        <td><span class="pill ${s.PredPlaced===1?'good':'bad'}">${s.PredPlaced===1?'Placed':'Not'}</span></td>
+        <td>$${s.TrueSalary}k</td><td>$${s.PredSalary}k</td>
+        <td><b>$${s.AbsError}k</b> ${isOutlier?'⚠️ OUTLIER':''}</td>
+      </tr>`;
+    });
+    tHtml += `</tbody></table>`;
+    document.getElementById("modC_tableDetail").innerHTML = tHtml;
+
+    let qHtml = "";
+    res.quiz.forEach((q, i) => {
+      qHtml += `<div style="margin-bottom:10px; padding:10px; background:#f4f6fb; border-radius:8px;">
+        <div style="font-weight:700; font-size:13px;">Q${i+1}: ${q.q}</div>
+        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;"><b>Answer:</b> ${q.a}</div>
+      </div>`;
+    });
+    document.getElementById("modC_quizDetail").innerHTML = qHtml;
+  } catch (e) { console.error(e); }
+}
+
+async function calculateModCHuber() {
+  const err = parseFloat(document.getElementById("modC_in_err").value) || 4.0;
+  const delta = parseFloat(document.getElementById("modC_in_delta").value) || 1.345;
+  const res = await fetch(API + `/api/curriculum/interactive/module_c?residual=${err}&delta=${delta}`).then(r => r.json());
+  document.getElementById("modC_huberResult").innerHTML = `
+    <div class="metric-row"><span>Huber Loss L_δ(e)</span><span><b>${res.huber_loss}</b></span></div>
+    <div class="metric-row"><span>MSE Quadratic Loss (0.5·e²)</span><span>${res.squared_error_loss}</span></div>
+    <div class="metric-row"><span>MAE Linear Loss (|e|)</span><span>${res.absolute_error_loss}</span></div>`;
+}
+
+async function loadModuleD() {
+  try {
+    const res = await fetch(API + "/api/curriculum/module_d").then(r => r.json());
+    let tHtml = `<table><thead><tr><th>Threshold τ</th><th>TP</th><th>FP</th><th>TN</th><th>FN</th><th>TPR</th><th>FPR</th><th>Precision</th><th>Accuracy</th><th>Policy Note</th></tr></thead><tbody>`;
+    const notes = {
+      0.9: "Conservative. Zero false alarms, misses 60% of placed.",
+      0.72: "Optimal Youden's J (J=1.00). Perfect separation!",
+      0.5: "Default cutoff. Perfect recall, but S08 false alarm.",
+      0.3: "Permissive. Captures all placed, FP rises to 2."
+    };
+    res.trajectory_table.forEach(r => {
+      const isOpt = r.threshold === 0.72;
+      tHtml += `<tr style="${isOpt ? 'background:#e9fbf6;' : ''}">
+        <td><b>≥ ${r.threshold}</b> ${isOpt?'★':''}</td><td>${r.TP}</td><td>${r.FP}</td><td>${r.TN}</td><td>${r.FN}</td>
+        <td>${(r.TPR*100).toFixed(0)}%</td><td>${(r.FPR*100).toFixed(0)}%</td><td>${(r.Precision*100).toFixed(1)}%</td><td>${(r.Accuracy*100).toFixed(0)}%</td>
+        <td>${notes[r.threshold] || ''}</td>
+      </tr>`;
+    });
+    tHtml += `</tbody></table>`;
+    document.getElementById("modD_trajectoryTable").innerHTML = tHtml;
+
+    let qHtml = "";
+    res.quiz.forEach((q, i) => {
+      qHtml += `<div style="margin-bottom:10px; padding:10px; background:#f4f6fb; border-radius:8px;">
+        <div style="font-weight:700; font-size:13px;">Q${i+1}: ${q.q}</div>
+        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;"><b>Answer:</b> ${q.a}</div>
+      </div>`;
+    });
+    document.getElementById("modD_quizDetail").innerHTML = qHtml;
+  } catch (e) { console.error(e); }
+}
+
+async function updateModDInteractive() {
+  const tau = parseFloat(document.getElementById("modD_in_tau").value);
+  const cfp = parseFloat(document.getElementById("modD_in_cfp").value) || 1.0;
+  const cfn = parseFloat(document.getElementById("modD_in_cfn").value) || 5.0;
+  document.getElementById("modD_tauLabel").textContent = tau.toFixed(2);
+  const res = await fetch(API + `/api/curriculum/interactive/module_d?threshold=${tau}&cost_fp=${cfp}&cost_fn=${cfn}`).then(r => r.json());
+  document.getElementById("modD_dynCm").textContent = `TP: ${res.TP} | FP: ${res.FP} | TN: ${res.TN} | FN: ${res.FN}`;
+  document.getElementById("modD_dynTpr").textContent = `${res.TPR} / ${(1-res.FPR).toFixed(4)}`;
+  document.getElementById("modD_dynYouden").innerHTML = `<b>${res.Youden_J.toFixed(4)}</b> (Dist to corner: ${res.DistToCorner.toFixed(4)})`;
+  document.getElementById("modD_dynLoss").innerHTML = `<b>$${res.ExpectedLoss.toFixed(2)}</b>`;
+}
+
+async function loadModuleE() {
+  try {
+    const res = await fetch(API + "/api/curriculum/module_e").then(r => r.json());
+    let tHtml = `<table><thead><tr><th>Cutoff τ</th><th>TP</th><th>FP</th><th>TN</th><th>FN</th><th>Precision</th><th>Recall</th><th>F1-Score</th><th>Imbalance Impact</th></tr></thead><tbody>`;
+    const notes = {
+      0.9: "Optimal Cutoff (τ*). Perfect Precision & Recall (Zero FP).",
+      0.8: "Precision drops to 50% as S01 and S09 false alarms enter.",
+      0.7: "Precision degrades further due to S05 false alarm.",
+      0.5: "Default Cutoff Trap! 66.7% false alarm rate in positive predictions!",
+      0.2: "Approaching random baseline prevalence (π = 20.0%)."
+    };
+    res.trajectory_table.forEach(r => {
+      const isOpt = r.threshold === 0.90;
+      tHtml += `<tr style="${isOpt ? 'background:#e9fbf6;' : ''}">
+        <td><b>≥ ${r.threshold.toFixed(2)}</b> ${isOpt?'★':''}</td><td>${r.TP}</td><td>${r.FP}</td><td>${r.TN}</td><td>${r.FN}</td>
+        <td><b>${r.Precision}%</b></td><td>${r.Recall}%</td><td>${r.F1}%</td>
+        <td>${notes[r.threshold] || ''}</td>
+      </tr>`;
+    });
+    tHtml += `</tbody></table>`;
+    document.getElementById("modE_trajectoryTable").innerHTML = tHtml;
+
+    const sol = res.practice_problem_solution;
+    document.getElementById("modE_practiceDetail").innerHTML = `
+      <div class="metric-row"><span>Random Baseline (π)</span><span>4 / 8 = <b>${sol.baseline_prevalence}</b></span></div>
+      <div class="metric-row"><span>Cutoff 0.55</span><span>TP=${sol.cutoff_0_55.TP}, FP=${sol.cutoff_0_55.FP} → Precision: <b>${sol.cutoff_0_55.precision}</b>, Recall: <b>${sol.cutoff_0_55.recall}</b></span></div>
+      <div class="metric-row"><span>Cutoff 0.35</span><span>TP=${sol.cutoff_0_35.TP}, FP=${sol.cutoff_0_35.FP} → Precision: <b>${sol.cutoff_0_35.precision}</b>, Recall: <b>${sol.cutoff_0_35.recall}</b></span></div>
+      <div class="metric-row" style="background:#e9fbf6; padding:8px; border-radius:6px;"><span>Average Precision (AP)</span><span>(1.0 + 1.0 + 0.75 + 0.667)/4 = <b>${sol.average_precision}</b> (Gain: +${sol.gain_over_baseline})</span></div>`;
+
+    let qHtml = "";
+    res.quiz.forEach((q, i) => {
+      qHtml += `<div style="margin-bottom:10px; padding:10px; background:#f4f6fb; border-radius:8px;">
+        <div style="font-weight:700; font-size:13px;">Q${i+1}: ${q.q}</div>
+        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;"><b>Answer:</b> ${q.a}</div>
+      </div>`;
+    });
+    document.getElementById("modE_quizDetail").innerHTML = qHtml;
+  } catch (e) { console.error(e); }
+}
+
+async function loadModuleF() {
+  try {
+    const res = await fetch(API + "/api/curriculum/module_f").then(r => r.json());
+    let tHtml = `<table><thead><tr><th>Student</th><th>CGPA</th><th>Aptitude</th><th>Actual y</th><th>Raw p</th><th>Platt p_cal</th><th>Isotonic p</th></tr></thead><tbody>`;
+    res.calibration_table.forEach(s => {
+      tHtml += `<tr><td><b>${s.Student}</b></td><td>${s.CGPA}</td><td>${s.Aptitude}</td>
+        <td><span class="pill ${s.ActualY===1?'good':'bad'}">${s.ActualY===1?'Placed':'Not'}</span></td>
+        <td>${s.RawP}</td><td><b>${s.PlattP}</b></td><td><b>${s.IsotonicP}</b></td></tr>`;
+    });
+    tHtml += `</tbody></table>`;
+    tHtml += `<div style="margin-top:10px; font-size:12px; color:var(--text-muted);"><b>Brier Scores:</b> Raw = 0.157 → Platt = 0.143 → Isotonic = 0.100 (Lower is better!)</div>`;
+    document.getElementById("modF_tableDetail").innerHTML = tHtml;
+  } catch (e) { console.error(e); }
+}
+
+async function calculateModFPlatt() {
+  const p = parseFloat(document.getElementById("modF_in_praw").value) || 0.60;
+  const a = parseFloat(document.getElementById("modF_in_a").value) || 1.773;
+  const b = parseFloat(document.getElementById("modF_in_b").value) || 0.789;
+  const res = await fetch(API + `/api/curriculum/interactive/module_f?raw_probability=${p}&param_a=${a}&param_b=${b}`).then(r => r.json());
+  document.getElementById("modF_plattResult").innerHTML = `Raw: <b>${res.raw_probability}</b> → Log-odds f = ln(p/(1-p)) → Calibrated: <b>${res.calibrated_probability}</b> (Platt Sigmoid)`;
+}
+
+async function loadModuleG() {
+  try {
+    const res = await fetch(API + "/api/curriculum/module_g").then(r => r.json());
+    let gpHtml = `<table><thead><tr><th>Tree Depth</th><th>Predicted Mean Acc</th><th>Uncertainty σ</th><th>Expected Improvement</th></tr></thead><tbody>`;
+    res.bayesian_optimization_gp.gp_predictions_table.forEach(g => {
+      gpHtml += `<tr><td>Depth ${g.depth}</td><td>${g.predicted_mean_acc}</td><td>±${g.uncertainty_sigma}</td><td><b>${g.expected_improvement}</b></td></tr>`;
+    });
+    gpHtml += `</tbody></table>`;
+    gpHtml += `<div style="margin-top:10px; font-weight:700; color:var(--accent-teal);">Next Recommended Candidate: Depth = ${res.bayesian_optimization_gp.next_recommended_depth_to_evaluate}</div>`;
+    document.getElementById("modG_gpDetail").innerHTML = gpHtml;
+  } catch (e) { console.error(e); }
+}
+
+async function calculateModGBudget() {
+  const lr = parseInt(document.getElementById("modG_in_lr").value) || 4;
+  const d = parseInt(document.getElementById("modG_in_depth").value) || 3;
+  const res = await fetch(API + `/api/curriculum/interactive/module_g?n_lr=${lr}&n_depths=${d}`).then(r => r.json());
+  document.getElementById("modG_budgetResult").innerHTML = `
+    Grid requires <b>${res.grid_model_fits} model fits</b> (${res.grid_configurations} configs × 5 folds).<br>
+    Random search of 60 draws achieves <b>${(res.random_60_p_hit*100).toFixed(1)}% chance</b> of landing in top 5%.<br>
+    Exact 95% confidence requires <b>n = ${res.samples_for_95_pct_confidence} samples</b>.`;
+}
+
+async function loadModuleH() {
+  try {
+    const res = await fetch(API + "/api/curriculum/module_h").then(r => r.json());
+    let tHtml = `<table><thead><tr><th>House</th><th>Location L</th><th>Size S (sqft)</th><th>Actual Price</th><th>Cluster</th><th>Baseline Pred</th><th>Baseline Residual</th><th>Augmented Pred</th><th>Augmented Residual</th></tr></thead><tbody>`;
+    res.comparison_table.forEach(h => {
+      tHtml += `<tr>
+        <td><b>House ${h.House}</b></td><td>${h.Location_L}</td><td>${h.Size_S}</td><td>$${h.Actual_Price}k</td>
+        <td><span class="pill ${h.Cluster==='A'?'good':'bad'}">Cluster ${h.Cluster}</span></td>
+        <td>$${h.Baseline_Pred}k</td><td style="color:${h.Baseline_Residual<0?'var(--accent-red)':'var(--accent-teal)'};"><b>${h.Baseline_Residual}k</b></td>
+        <td>$${h.Augmented_Pred}k</td><td><b>$0.0k (0.0)</b></td>
+      </tr>`;
+    });
+    tHtml += `</tbody></table>`;
+    document.getElementById("modH_tableDetail").innerHTML = tHtml;
+  } catch (e) { console.error(e); }
+}
+
+async function predictModHPrice() {
+  const s = parseFloat(document.getElementById("modH_in_size").value) || 1100;
+  const c = document.getElementById("modH_in_cluster").value;
+  const res = await fetch(API + `/api/curriculum/interactive/module_h?size=${s}&cluster=${c}`).then(r => r.json());
+  document.getElementById("modH_predResult").innerHTML = `
+    Baseline (Size only): <b>$${res.baseline_predicted_price_k}k</b> | Augmented (Size + Cluster): <b>$${res.augmented_predicted_price_k}k</b><br>
+    Cluster Premium / Delta: <b>+$${res.difference_k}k</b>`;
+}
+
+async function loadModuleI() {
+  try {
+    const res = await fetch(API + "/api/curriculum/module_i").then(r => r.json());
+    let hHtml = `<table><thead><tr><th>Point</th><th>Coords</th><th>Cluster</th><th>Cohesion a(i)</th><th>Separation b(i)</th><th>Silhouette s(i)</th></tr></thead><tbody>`;
+    res.slide24_hand_calculation.points_table.forEach(p => {
+      hHtml += `<tr><td><b>${p.Point}</b></td><td>${p.Coordinates}</td><td>${p.Cluster}</td><td>${p.a_i}</td><td>${p.b_i}</td><td><b>${p.s_i}</b></td></tr>`;
+    });
+    hHtml += `</tbody></table>`;
+    hHtml += `<div style="margin-top:10px; font-weight:700;">Mean Silhouette s̄ = <span style="color:var(--accent-teal);">${res.slide24_hand_calculation.mean_silhouette_s_bar}</span> (${res.slide24_hand_calculation.interpretation})</div>`;
+    document.getElementById("modI_handTable").innerHTML = hHtml;
+
+    let eHtml = `<table><thead><tr><th>K</th><th>WCSS (Inertia)</th><th>Marginal Gain</th><th>Silhouette Score</th></tr></thead><tbody>`;
+    res.elbow_and_silhouette_trace.forEach(k => {
+      eHtml += `<tr><td><b>K = ${k.K}</b></td><td>${k.WCSS_Inertia}</td><td>−${k.Marginal_Gain_Reduction}</td><td><b>${k.Silhouette_Score}</b></td></tr>`;
+    });
+    eHtml += `</tbody></table>`;
+    document.getElementById("modI_elbowTable").innerHTML = eHtml;
+
+    let vHtml = "";
+    res.viva_questions.forEach((v, i) => {
+      vHtml += `<div style="margin-bottom:10px; padding:10px; background:#f4f6fb; border-radius:8px;">
+        <div style="font-weight:700; font-size:13px;">V${i+1}: ${v.q}</div>
+        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;"><b>Answer:</b> ${v.a}</div>
+      </div>`;
+    });
+    document.getElementById("modI_vivaDetail").innerHTML = vHtml;
+  } catch (e) { console.error(e); }
+}
+
+async function loadModuleJ() {
+  try {
+    const res = await fetch(API + "/api/curriculum/module_j").then(r => r.json());
+    let dHtml = `<table><thead><tr><th>Point</th><th>A (2)</th><th>B (4)</th><th>C (10)</th><th>D (12)</th><th>E (18)</th></tr></thead><tbody>`;
+    const labels = ["A", "B", "C", "D", "E"];
+    labels.forEach(l1 => {
+      dHtml += `<tr><td><b>${l1}</b></td>`;
+      labels.forEach(l2 => {
+        dHtml += `<td>${res.distance_matrix[l1][l2]}</td>`;
+      });
+      dHtml += `</tr>`;
+    });
+    dHtml += `</tbody></table>`;
+    document.getElementById("modJ_distMatrix").innerHTML = dHtml;
+
+    let wHtml = `<table><thead><tr><th>Step</th><th>Joined Subtrees</th><th>Merge Height h</th><th>Cluster Size</th></tr></thead><tbody>`;
+    res.ward_merges.merge_sequence.forEach(m => {
+      wHtml += `<tr><td>Step ${m.step}</td><td><b>${m.join}</b></td><td><b>h = ${m.height}</b></td><td>${m.cluster_size}</td></tr>`;
+    });
+    wHtml += `</tbody></table>`;
+    wHtml += `<div class="warn-box" style="margin-top:10px;">✂️ <b>Optimal Cut:</b> Largest gap is between h=5.72 and h=11.32 (gap = 5.60) → Cut at h=8.0 yields <b>K = 2 clusters: {A,B} and {C,D,E}</b>.</div>`;
+    document.getElementById("modJ_wardMerges").innerHTML = wHtml;
+
+    let rHtml = `<table><thead><tr><th>Customer ID</th><th>Annual Spend (₹'000)</th><th>Visits/Month</th><th>Assigned Segment</th></tr></thead><tbody>`;
+    res.retail_case_study.customers.forEach(c => {
+      rHtml += `<tr><td><b>${c.id}</b></td><td>₹${c.annual_spend_k}k</td><td>${c.visits_pm}</td><td><span class="pill ${c.segment===1?'good':'bad'}">Segment ${c.segment}</span></td></tr>`;
+    });
+    rHtml += `</tbody></table>`;
+    rHtml += `<p style="font-size:12px; color:var(--text-muted); margin-top:8px;">${res.retail_case_study.recommendation}</p>`;
+    document.getElementById("modJ_retailDetail").innerHTML = rHtml;
+
+    let vHtml = "";
+    res.viva_questions.forEach((v, i) => {
+      vHtml += `<div style="margin-bottom:10px; padding:10px; background:#f4f6fb; border-radius:8px;">
+        <div style="font-weight:700; font-size:13px;">V${i+1}: ${v.q}</div>
+        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;"><b>Answer:</b> ${v.a}</div>
+      </div>`;
+    });
+    document.getElementById("modJ_vivaDetail").innerHTML = vHtml;
+  } catch (e) { console.error(e); }
+}
+
+
+function copyCode(btn) {
+  const pre = btn.closest('.code-box').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    const orig = btn.innerText;
+    btn.innerText = 'Copied!';
+    setTimeout(() => { btn.innerText = orig; }, 1500);
+  });
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "model_architecture": "HistGradientBoostingClassifier",
+  "serialized_at": "2026-10-13 05:28:06 UTC",
+  "input_features": [
+    "cgpa",
+    "iq",
+    "internships",
+    "projects",
+    "backlogs"
+  ],
+  "evaluation_metrics": {
+    "accuracy": 0.965,
+    "samples_evaluated": 200
+  },
+  "python_environment": {
+    "numpy_version": "2.5.3",
+    "pandas_version": "3.0.5"
+  }
+}

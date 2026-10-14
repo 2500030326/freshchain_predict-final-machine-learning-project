@@ -1,0 +1,79 @@
+{
+  "module_id": "M6",
+  "title": "ML Engineering \u2014 From Notebook to Production",
+  "feature_store": {
+    "offline_table_records": 4,
+    "online_kv_cache": {
+      "101": {
+        "cgpa": 7.8,
+        "projects": 3
+      },
+      "102": {
+        "cgpa": 8.4,
+        "projects": 4
+      }
+    },
+    "point_in_time_join_example": {
+      "entity_id": 101,
+      "event_time": "2026-03-15",
+      "features_retrieved": {
+        "cgpa": 7.1,
+        "projects": 1
+      },
+      "leakage_prevented": "Correctly ignores the future June 2026 update (CGPA 7.8, projects 3)."
+    }
+  },
+  "training_serving_skew": {
+    "schema_checks": [
+      {
+        "type": "MISSING_COLUMN",
+        "severity": "CRITICAL",
+        "message": "Missing column 'cgpa' in payload."
+      },
+      {
+        "type": "UNEXPECTED_COLUMN",
+        "severity": "WARNING",
+        "message": "Extra unmapped column 'gpa' present."
+      },
+      {
+        "type": "TYPE_MISMATCH",
+        "severity": "CRITICAL",
+        "message": "Column 'iq' expected float64, received str."
+      }
+    ]
+  },
+  "drift_monitoring": {
+    "normal_batch": {
+      "psi": 0.0293,
+      "ks_p_value": 0.0158,
+      "status": "HEALTHY"
+    },
+    "drifted_batch": {
+      "psi": 4.9099,
+      "ks_p_value": 3.801379796690852e-153,
+      "status": "DRIFT_DETECTED",
+      "alert": "PSI >= 0.25 threshold exceeded! Triggering automated model retraining pipeline."
+    }
+  },
+  "serving_latency": {
+    "p50_ms": 4.47,
+    "p95_ms": 9.32,
+    "p99_ms": 12.96,
+    "sla_compliance": "PASS (p99 < 25ms SLA)"
+  },
+  "model_packaging": {
+    "serialized_artifact": "models_packaged/champion_model.joblib",
+    "metadata_manifest": "models_packaged/manifest.json",
+    "format": "Portable Joblib + JSON Provenance Manifest + ONNX preview",
+    "hash_verification": "SHA-256 integrity verified"
+  },
+  "mlops_tracking": {
+    "experiment_name": "produce_quality_coldchain",
+    "run_id": "run_exp_v2_champion",
+    "frameworks": [
+      "MLflow Experiment Tracker",
+      "DVC Data Versioning"
+    ],
+    "artifact_dvc_pointer": "models_packaged/champion_model.joblib.dvc (sha256: 7f8a9...)"
+  }
+}

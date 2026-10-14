@@ -1,0 +1,196 @@
+{
+  "distance_matrix": {
+    "A": {
+      "A": 0.0,
+      "B": 2.0,
+      "C": 8.0,
+      "D": 10.0,
+      "E": 16.0
+    },
+    "B": {
+      "A": 2.0,
+      "B": 0.0,
+      "C": 6.0,
+      "D": 8.0,
+      "E": 14.0
+    },
+    "C": {
+      "A": 8.0,
+      "B": 6.0,
+      "C": 0.0,
+      "D": 2.0,
+      "E": 8.0
+    },
+    "D": {
+      "A": 10.0,
+      "B": 8.0,
+      "C": 2.0,
+      "D": 0.0,
+      "E": 6.0
+    },
+    "E": {
+      "A": 16.0,
+      "B": 14.0,
+      "C": 8.0,
+      "D": 6.0,
+      "E": 0.0
+    }
+  },
+  "ward_merges": {
+    "merge_sequence": [
+      {
+        "step": 1,
+        "join": "(A,B)",
+        "height": 2.0,
+        "cluster_size": 2
+      },
+      {
+        "step": 2,
+        "join": "(C,D)",
+        "height": 2.0,
+        "cluster_size": 2
+      },
+      {
+        "step": 3,
+        "join": "(E,(C,D))",
+        "height": 8.08,
+        "cluster_size": 3
+      },
+      {
+        "step": 4,
+        "join": "((A,B),(E,(C,D)))",
+        "height": 16.01,
+        "cluster_size": 5
+      }
+    ],
+    "cut_table": [
+      {
+        "cut_range": "t > 11.32",
+        "K": 1,
+        "partition": "{A, B, C, D, E}"
+      },
+      {
+        "cut_range": "5.72 < t <= 11.32",
+        "K": 2,
+        "partition": "{A, B}, {C, D, E} (Optimal - Largest Gap 5.60)"
+      },
+      {
+        "cut_range": "1.41 < t <= 5.72",
+        "K": 3,
+        "partition": "{A, B}, {C, D}, {E}"
+      },
+      {
+        "cut_range": "t <= 1.41",
+        "K": 5,
+        "partition": "All singletons: {A}, {B}, {C}, {D}, {E}"
+      }
+    ],
+    "slide_reported_merges": [
+      {
+        "join": "(A,B)",
+        "height": 1.41
+      },
+      {
+        "join": "(C,D)",
+        "height": 1.41
+      },
+      {
+        "join": "(CD,E)",
+        "height": 5.72
+      },
+      {
+        "join": "(AB,CDE)",
+        "height": 11.32
+      }
+    ]
+  },
+  "retail_case_study": {
+    "customers": [
+      {
+        "id": "P1",
+        "annual_spend_k": 10,
+        "visits_pm": 2,
+        "segment": 1
+      },
+      {
+        "id": "P2",
+        "annual_spend_k": 12,
+        "visits_pm": 3,
+        "segment": 1
+      },
+      {
+        "id": "P3",
+        "annual_spend_k": 11,
+        "visits_pm": 2,
+        "segment": 1
+      },
+      {
+        "id": "P4",
+        "annual_spend_k": 60,
+        "visits_pm": 15,
+        "segment": 2
+      },
+      {
+        "id": "P5",
+        "annual_spend_k": 62,
+        "visits_pm": 14,
+        "segment": 2
+      },
+      {
+        "id": "P6",
+        "annual_spend_k": 58,
+        "visits_pm": 16,
+        "segment": 2
+      }
+    ],
+    "segments": {
+      "Segment 1 (Value/Casual)": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "Segment 2 (High-Value VIPs)": [
+        "P4",
+        "P5",
+        "P6"
+      ]
+    },
+    "recommendation": "Optimal cut suggests K=2. Massive gap between low-spend cluster (Spend~11k, Visits~2) and VIP cluster (Spend~60k, Visits~15)."
+  },
+  "linkage_comparison": {
+    "Single": {
+      "Formula": "min pairwise dist",
+      "Shape": "Chained, elongated",
+      "Sensitivity": "Low to outliers, suffers from chaining"
+    },
+    "Complete": {
+      "Formula": "max pairwise dist",
+      "Shape": "Compact, spherical",
+      "Sensitivity": "High to outliers"
+    },
+    "Average": {
+      "Formula": "mean pairwise dist",
+      "Shape": "Balanced compromise",
+      "Sensitivity": "Moderate"
+    },
+    "Ward": {
+      "Formula": "delta WCSS (variance increase)",
+      "Shape": "Most compact (K-Means-like)",
+      "Sensitivity": "Moderate (industry standard default)"
+    }
+  },
+  "viva_questions": [
+    {
+      "q": "Why doesn't agglomerative clustering require K to be specified in advance?",
+      "a": "Because it builds a complete dendrogram from N singleton leaves to 1 root, encoding every possible partition from K=N to K=1 simultaneously."
+    },
+    {
+      "q": "Can a dendrogram ever have a merge height LOWER than one of its children's height?",
+      "a": "For metric linkages (Single, Complete, Average, Ward), merge heights are strictly monotonic (h_parent >= h_child). Centroid or median linkage can cause non-monotonic inversions."
+    },
+    {
+      "q": "Why is Ward's linkage often called 'K-Means in disguise'?",
+      "a": "Because both optimize the exact same objective: minimizing Within-Cluster Sum of Squares (WCSS / variance increase)."
+    }
+  ]
+}

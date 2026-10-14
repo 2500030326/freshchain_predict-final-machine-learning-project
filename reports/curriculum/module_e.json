@@ -1,0 +1,180 @@
+{
+  "dataset": [
+    {
+      "StudentID": "S03",
+      "CGPA": 9.1,
+      "Coding": 92,
+      "TrueClass": 1,
+      "PredProb": 0.95,
+      "RankOrder": 1
+    },
+    {
+      "StudentID": "S07",
+      "CGPA": 8.8,
+      "Coding": 89,
+      "TrueClass": 1,
+      "PredProb": 0.91,
+      "RankOrder": 2
+    },
+    {
+      "StudentID": "S01",
+      "CGPA": 8.5,
+      "Coding": 85,
+      "TrueClass": 0,
+      "PredProb": 0.88,
+      "RankOrder": 3
+    },
+    {
+      "StudentID": "S09",
+      "CGPA": 8.2,
+      "Coding": 80,
+      "TrueClass": 0,
+      "PredProb": 0.82,
+      "RankOrder": 4
+    },
+    {
+      "StudentID": "S05",
+      "CGPA": 8.0,
+      "Coding": 72,
+      "TrueClass": 0,
+      "PredProb": 0.72,
+      "RankOrder": 5
+    },
+    {
+      "StudentID": "S08",
+      "CGPA": 7.5,
+      "Coding": 68,
+      "TrueClass": 0,
+      "PredProb": 0.6,
+      "RankOrder": 6
+    },
+    {
+      "StudentID": "S06",
+      "CGPA": 7.0,
+      "Coding": 61,
+      "TrueClass": 0,
+      "PredProb": 0.4,
+      "RankOrder": 7
+    },
+    {
+      "StudentID": "S02",
+      "CGPA": 7.2,
+      "Coding": 65,
+      "TrueClass": 0,
+      "PredProb": 0.25,
+      "RankOrder": 8
+    },
+    {
+      "StudentID": "S10",
+      "CGPA": 6.9,
+      "Coding": 59,
+      "TrueClass": 0,
+      "PredProb": 0.2,
+      "RankOrder": 9
+    },
+    {
+      "StudentID": "S04",
+      "CGPA": 6.8,
+      "Coding": 58,
+      "TrueClass": 0,
+      "PredProb": 0.15,
+      "RankOrder": 10
+    }
+  ],
+  "prevalence": 0.2,
+  "pr_auc": 1.0,
+  "average_precision": 1.0,
+  "optimal_threshold": 0.91,
+  "trajectory_table": [
+    {
+      "threshold": 0.9,
+      "TP": 2,
+      "FP": 0,
+      "TN": 8,
+      "FN": 0,
+      "Precision": 100.0,
+      "Recall": 100.0,
+      "F1": 100.0
+    },
+    {
+      "threshold": 0.8,
+      "TP": 2,
+      "FP": 2,
+      "TN": 6,
+      "FN": 0,
+      "Precision": 50.0,
+      "Recall": 100.0,
+      "F1": 66.7
+    },
+    {
+      "threshold": 0.7,
+      "TP": 2,
+      "FP": 3,
+      "TN": 5,
+      "FN": 0,
+      "Precision": 40.0,
+      "Recall": 100.0,
+      "F1": 57.1
+    },
+    {
+      "threshold": 0.5,
+      "TP": 2,
+      "FP": 4,
+      "TN": 4,
+      "FN": 0,
+      "Precision": 33.3,
+      "Recall": 100.0,
+      "F1": 50.0
+    },
+    {
+      "threshold": 0.2,
+      "TP": 2,
+      "FP": 7,
+      "TN": 1,
+      "FN": 0,
+      "Precision": 22.2,
+      "Recall": 100.0,
+      "F1": 36.4
+    }
+  ],
+  "dilution_demo": {
+    "scenario": "100 Positives, 99,000 Negatives, 90 TP, 990 FP",
+    "recall": 90.0,
+    "fpr": 1.0,
+    "precision": 8.33,
+    "takeaway": "ROC curve looks stellar at 1% FPR, yet 91.7% of all flagged alerts are false alarms! PR-AUC exposes this instantly."
+  },
+  "practice_problem_solution": {
+    "baseline_prevalence": 0.5,
+    "cutoff_0_55": {
+      "TP": 3,
+      "FP": 1,
+      "FN": 1,
+      "precision": 0.75,
+      "recall": 0.75
+    },
+    "cutoff_0_35": {
+      "TP": 4,
+      "FP": 2,
+      "FN": 0,
+      "precision": 0.667,
+      "recall": 1.0
+    },
+    "average_precision": 0.854,
+    "gain_over_baseline": 0.354
+  },
+  "quiz": [
+    {
+      "q": "What is the baseline PR-AUC score for a random classifier on a dataset with 5% positive class prevalence?",
+      "a": "0.05 (5.0%). In PR space, random guessing equals the positive class prevalence pi."
+    },
+    {
+      "q": "Why can ROC-AUC remain deceptively high when a model produces 1,000 false alarms on a rare positive class?",
+      "a": "Because the False Positive Rate denominator (N_neg) is massive, making FPR tiny. Precision-Recall AUC exposes this instantly because Precision = TP / (TP + FP)."
+    },
+    {
+      "q": "When optimizing an imbalanced prediction system where False Negatives are twice as costly as False Positives, which metric should be maximized?",
+      "a": "The F2-score (beta = 2.0), which places twice as much weight on Recall as Precision."
+    }
+  ]
+}

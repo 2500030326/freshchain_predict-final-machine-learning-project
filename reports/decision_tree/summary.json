@@ -1,0 +1,327 @@
+{
+  "entropy_and_information_gain": {
+    "root_samples": 5680,
+    "p_spoiled_root": 0.437,
+    "p_fresh_root": 0.563,
+    "root_entropy": 0.9885,
+    "root_gini": 0.4921,
+    "best_split_feature": "Humid (%)",
+    "best_split_threshold": 94.5,
+    "left_child": {
+      "condition": "Humid (%) <= 94.50",
+      "samples": 1751,
+      "p_spoiled": 0.0109,
+      "p_fresh": 0.9891,
+      "entropy": 0.0864
+    },
+    "right_child": {
+      "condition": "Humid (%) > 94.50",
+      "samples": 3929,
+      "p_spoiled": 0.6269,
+      "p_fresh": 0.3731,
+      "entropy": 0.953
+    },
+    "weighted_child_entropy": 0.6859,
+    "information_gain": 0.3026,
+    "explanation": "At the root node, initial uncertainty is 0.9885 bits. Splitting on 'Humid (%) <= 94.50' divides 5680 samples into a pure left branch (1751 samples with entropy 0.0864) and a right branch (3929 samples with entropy 0.9530). The weighted remaining entropy is 0.6859 bits, producing an Information Gain of 0.3026 bits (reduction in uncertainty)."
+  },
+  "entropy_vs_gini": {
+    "entropy_tree": {
+      "criterion": "entropy",
+      "formula": "Entropy(S) = -sum(p_i * log2(p_i))",
+      "depth": 11,
+      "leaves": 37,
+      "train_accuracy": 1.0,
+      "val_accuracy": 0.9951,
+      "test_accuracy": 0.9984
+    },
+    "gini_tree": {
+      "criterion": "gini",
+      "formula": "Gini(S) = 1 - sum(p_i^2)",
+      "depth": 12,
+      "leaves": 36,
+      "train_accuracy": 1.0,
+      "val_accuracy": 0.9959,
+      "test_accuracy": 0.9984
+    },
+    "comparison_note": "Gini is computationally faster because it avoids logarithmic operations. Entropy scales up to 1.0 bit for two classes, while Gini tops out at 0.5. Both criteria identify similar optimal decision boundaries on this dataset."
+  },
+  "mse_regression_demonstration": {
+    "formula": "MSE = (1/n) * sum((y_i - y_mean)^2)",
+    "distinction": "Classification criteria (Entropy and Gini) measure impurity across categorical frequency distributions. In contrast, MSE measures variance around a continuous arithmetic mean and is used exclusively for Regression. A regression tree selects splits to maximize Variance Reduction: Parent MSE - Weighted Child MSE.",
+    "demonstration": {
+      "continuous_target": "Storage Temperature (Temp in \u00b0C)",
+      "parent_mean": 23.82,
+      "parent_mse": 1.5994,
+      "split_feature": "Fruit_Orange",
+      "split_threshold": 0.5,
+      "left_child_mse": 1.473,
+      "right_child_mse": 0.5113,
+      "weighted_child_mse": 1.1864,
+      "variance_reduction": 0.413
+    }
+  },
+  "pre_pruning": {
+    "tuning_results": [
+      {
+        "param_max_depth": "1",
+        "tree_depth": 1,
+        "leaf_count": 2,
+        "train_accuracy": 0.7386,
+        "val_accuracy": 0.7592,
+        "test_accuracy": 0.7356
+      },
+      {
+        "param_max_depth": "2",
+        "tree_depth": 2,
+        "leaf_count": 4,
+        "train_accuracy": 0.8893,
+        "val_accuracy": 0.9088,
+        "test_accuracy": 0.8949
+      },
+      {
+        "param_max_depth": "3",
+        "tree_depth": 3,
+        "leaf_count": 7,
+        "train_accuracy": 0.9199,
+        "val_accuracy": 0.9376,
+        "test_accuracy": 0.931
+      },
+      {
+        "param_max_depth": "4",
+        "tree_depth": 4,
+        "leaf_count": 9,
+        "train_accuracy": 0.9218,
+        "val_accuracy": 0.9376,
+        "test_accuracy": 0.931
+      },
+      {
+        "param_max_depth": "5",
+        "tree_depth": 5,
+        "leaf_count": 12,
+        "train_accuracy": 0.9611,
+        "val_accuracy": 0.9663,
+        "test_accuracy": 0.968
+      },
+      {
+        "param_max_depth": "6",
+        "tree_depth": 6,
+        "leaf_count": 15,
+        "train_accuracy": 0.9798,
+        "val_accuracy": 0.9811,
+        "test_accuracy": 0.977
+      },
+      {
+        "param_max_depth": "8",
+        "tree_depth": 8,
+        "leaf_count": 23,
+        "train_accuracy": 0.9967,
+        "val_accuracy": 0.9951,
+        "test_accuracy": 0.9975
+      },
+      {
+        "param_max_depth": "10",
+        "tree_depth": 10,
+        "leaf_count": 32,
+        "train_accuracy": 0.9989,
+        "val_accuracy": 0.9959,
+        "test_accuracy": 0.9975
+      },
+      {
+        "param_max_depth": "15",
+        "tree_depth": 12,
+        "leaf_count": 36,
+        "train_accuracy": 1.0,
+        "val_accuracy": 0.9959,
+        "test_accuracy": 0.9984
+      },
+      {
+        "param_max_depth": "None",
+        "tree_depth": 12,
+        "leaf_count": 36,
+        "train_accuracy": 1.0,
+        "val_accuracy": 0.9959,
+        "test_accuracy": 0.9984
+      }
+    ],
+    "best_configuration": {
+      "param_max_depth": "10",
+      "tree_depth": 10,
+      "leaf_count": 32,
+      "train_accuracy": 0.9989,
+      "val_accuracy": 0.9959,
+      "test_accuracy": 0.9975
+    }
+  },
+  "cost_complexity_pruning": {
+    "ccp_records": [
+      {
+        "ccp_alpha": 0.0,
+        "tree_depth": 12,
+        "leaf_count": 36,
+        "train_accuracy": 1.0,
+        "val_accuracy": 0.9959
+      },
+      {
+        "ccp_alpha": 0.000117,
+        "tree_depth": 11,
+        "leaf_count": 30,
+        "train_accuracy": 0.9996,
+        "val_accuracy": 0.9959
+      },
+      {
+        "ccp_alpha": 0.000235,
+        "tree_depth": 11,
+        "leaf_count": 28,
+        "train_accuracy": 0.9993,
+        "val_accuracy": 0.9951
+      },
+      {
+        "ccp_alpha": 0.000235,
+        "tree_depth": 11,
+        "leaf_count": 28,
+        "train_accuracy": 0.9993,
+        "val_accuracy": 0.9951
+      },
+      {
+        "ccp_alpha": 0.00032,
+        "tree_depth": 11,
+        "leaf_count": 27,
+        "train_accuracy": 0.9991,
+        "val_accuracy": 0.9951
+      },
+      {
+        "ccp_alpha": 0.000325,
+        "tree_depth": 11,
+        "leaf_count": 26,
+        "train_accuracy": 0.9989,
+        "val_accuracy": 0.9951
+      },
+      {
+        "ccp_alpha": 0.000351,
+        "tree_depth": 11,
+        "leaf_count": 25,
+        "train_accuracy": 0.9988,
+        "val_accuracy": 0.9951
+      },
+      {
+        "ccp_alpha": 0.000465,
+        "tree_depth": 9,
+        "leaf_count": 20,
+        "train_accuracy": 0.9977,
+        "val_accuracy": 0.9951
+      },
+      {
+        "ccp_alpha": 0.000694,
+        "tree_depth": 9,
+        "leaf_count": 19,
+        "train_accuracy": 0.9974,
+        "val_accuracy": 0.9926
+      },
+      {
+        "ccp_alpha": 0.000699,
+        "tree_depth": 9,
+        "leaf_count": 18,
+        "train_accuracy": 0.997,
+        "val_accuracy": 0.9926
+      },
+      {
+        "ccp_alpha": 0.001008,
+        "tree_depth": 9,
+        "leaf_count": 17,
+        "train_accuracy": 0.9965,
+        "val_accuracy": 0.9926
+      },
+      {
+        "ccp_alpha": 0.00167,
+        "tree_depth": 8,
+        "leaf_count": 16,
+        "train_accuracy": 0.9949,
+        "val_accuracy": 0.9918
+      },
+      {
+        "ccp_alpha": 0.001936,
+        "tree_depth": 8,
+        "leaf_count": 14,
+        "train_accuracy": 0.993,
+        "val_accuracy": 0.9918
+      },
+      {
+        "ccp_alpha": 0.002046,
+        "tree_depth": 7,
+        "leaf_count": 13,
+        "train_accuracy": 0.9924,
+        "val_accuracy": 0.9926
+      },
+      {
+        "ccp_alpha": 0.002421,
+        "tree_depth": 7,
+        "leaf_count": 12,
+        "train_accuracy": 0.9912,
+        "val_accuracy": 0.9918
+      },
+      {
+        "ccp_alpha": 0.00722,
+        "tree_depth": 7,
+        "leaf_count": 11,
+        "train_accuracy": 0.9875,
+        "val_accuracy": 0.9877
+      },
+      {
+        "ccp_alpha": 0.009331,
+        "tree_depth": 7,
+        "leaf_count": 10,
+        "train_accuracy": 0.9783,
+        "val_accuracy": 0.9795
+      },
+      {
+        "ccp_alpha": 0.01152,
+        "tree_depth": 6,
+        "leaf_count": 7,
+        "train_accuracy": 0.9636,
+        "val_accuracy": 0.968
+      },
+      {
+        "ccp_alpha": 0.015713,
+        "tree_depth": 5,
+        "leaf_count": 6,
+        "train_accuracy": 0.954,
+        "val_accuracy": 0.9614
+      },
+      {
+        "ccp_alpha": 0.031071,
+        "tree_depth": 3,
+        "leaf_count": 4,
+        "train_accuracy": 0.915,
+        "val_accuracy": 0.9326
+      },
+      {
+        "ccp_alpha": 0.036655,
+        "tree_depth": 2,
+        "leaf_count": 3,
+        "train_accuracy": 0.888,
+        "val_accuracy": 0.908
+      },
+      {
+        "ccp_alpha": 0.147683,
+        "tree_depth": 1,
+        "leaf_count": 2,
+        "train_accuracy": 0.7386,
+        "val_accuracy": 0.7592
+      },
+      {
+        "ccp_alpha": 0.161845,
+        "tree_depth": 0,
+        "leaf_count": 1,
+        "train_accuracy": 0.563,
+        "val_accuracy": 0.5629
+      }
+    ],
+    "optimal_alpha": 0.0,
+    "optimal_tree_depth": 12,
+    "optimal_leaf_count": 36,
+    "best_val_accuracy": 0.9959,
+    "final_test_accuracy": 0.9984,
+    "weakest_link_explanation": "Weakest-Link Pruning: At each step, scikit-learn evaluates all internal nodes t and computes g(t) = [R(t) - R(T_t)] / (|T_t| - 1). The node with the minimum g(t) value produces the smallest increase in impurity per leaf removed, making it the 'weakest link'. Pruning this link yields the next subtree in the cost-complexity sequence. As alpha increases, weaker subtrees collapse sequentially until only the root remains."
+  }
+}

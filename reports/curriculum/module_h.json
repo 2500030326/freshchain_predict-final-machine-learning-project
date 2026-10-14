@@ -1,0 +1,153 @@
+{
+  "dataset_table": [
+    {
+      "House": 1,
+      "Location_L": 1.0,
+      "Size_S": 1000.0,
+      "Price_P": 150.0,
+      "Cluster": "A"
+    },
+    {
+      "House": 2,
+      "Location_L": 2.0,
+      "Size_S": 1200.0,
+      "Price_P": 180.0,
+      "Cluster": "A"
+    },
+    {
+      "House": 3,
+      "Location_L": 8.0,
+      "Size_S": 1000.0,
+      "Price_P": 300.0,
+      "Cluster": "B"
+    },
+    {
+      "House": 4,
+      "Location_L": 9.0,
+      "Size_S": 1200.0,
+      "Price_P": 340.0,
+      "Cluster": "B"
+    },
+    {
+      "House": 5,
+      "Location_L": 8.5,
+      "Size_S": 1100.0,
+      "Price_P": 320.0,
+      "Cluster": "B"
+    }
+  ],
+  "step1_kmeans": {
+    "cluster_a_centroid": 1.5,
+    "cluster_b_centroid": 8.5,
+    "convergence": "Immediate on iteration 1 (all points already closest to their group centroid)."
+  },
+  "step2_baseline_model": {
+    "s_mean": 1100.0,
+    "p_mean": 258.0,
+    "numerator_cov": 7000.0,
+    "denominator_var": 40000.0,
+    "beta_0_intercept": 65.5,
+    "beta_1_slope": 0.175,
+    "fitted_equation": "P_hat = 65.5 + 0.175 * S",
+    "predictions": [
+      240.5,
+      275.5,
+      240.5,
+      275.5,
+      258.0
+    ],
+    "residuals": [
+      -90.5,
+      -95.5,
+      59.5,
+      64.5,
+      62.0
+    ],
+    "r2_score": 0.0407
+  },
+  "step3_augmented_model": {
+    "beta_0": 0.0,
+    "beta_1_size": 0.15,
+    "beta_2_cluster": 100.0,
+    "beta_3_interaction": 0.05,
+    "augmented_equation": "P_hat = 0.15*S + 100*C + 0.05*(S*C)",
+    "predictions": [
+      150.0,
+      180.0,
+      300.0,
+      340.0,
+      320.0
+    ],
+    "residuals": [
+      -0.0,
+      -0.0,
+      -0.0,
+      0.0,
+      0.0
+    ],
+    "r2_score": 1.0
+  },
+  "comparison_table": [
+    {
+      "House": 1,
+      "Location_L": 1.0,
+      "Size_S": 1000.0,
+      "Actual_Price": 150.0,
+      "Cluster": "A",
+      "Baseline_Pred": 240.5,
+      "Baseline_Residual": -90.5,
+      "Augmented_Pred": 150.0,
+      "Augmented_Residual": -0.0
+    },
+    {
+      "House": 2,
+      "Location_L": 2.0,
+      "Size_S": 1200.0,
+      "Actual_Price": 180.0,
+      "Cluster": "A",
+      "Baseline_Pred": 275.5,
+      "Baseline_Residual": -95.5,
+      "Augmented_Pred": 180.0,
+      "Augmented_Residual": -0.0
+    },
+    {
+      "House": 3,
+      "Location_L": 8.0,
+      "Size_S": 1000.0,
+      "Actual_Price": 300.0,
+      "Cluster": "B",
+      "Baseline_Pred": 240.5,
+      "Baseline_Residual": 59.5,
+      "Augmented_Pred": 300.0,
+      "Augmented_Residual": -0.0
+    },
+    {
+      "House": 4,
+      "Location_L": 9.0,
+      "Size_S": 1200.0,
+      "Actual_Price": 340.0,
+      "Cluster": "B",
+      "Baseline_Pred": 275.5,
+      "Baseline_Residual": 64.5,
+      "Augmented_Pred": 340.0,
+      "Augmented_Residual": 0.0
+    },
+    {
+      "House": 5,
+      "Location_L": 8.5,
+      "Size_S": 1100.0,
+      "Actual_Price": 320.0,
+      "Cluster": "B",
+      "Baseline_Pred": 258.0,
+      "Baseline_Residual": 62.0,
+      "Augmented_Pred": 320.0,
+      "Augmented_Residual": 0.0
+    }
+  ],
+  "diagnosis_omitted_variable_bias": {
+    "cluster_a_residuals": "[-90.5, -95.5] (All negative -> Model consistently over-predicts)",
+    "cluster_b_residuals": "[+59.5, +64.5, +62.0] (All positive -> Model consistently under-predicts)",
+    "root_cause": "Location/Cluster drives price but was omitted from the baseline model."
+  },
+  "takeaway": "The jump from R2 = 0.04 to R2 = 1.0 shows Location/Cluster was the dominant driver of price \u2014 not a minor refinement, but a variable the baseline model could not afford to omit."
+}

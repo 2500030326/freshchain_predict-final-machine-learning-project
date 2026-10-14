@@ -1,0 +1,95 @@
+{
+  "module_id": "M4",
+  "title": "Unsupervised Learning",
+  "elbow_silhouette": [
+    {
+      "k": 2,
+      "inertia": 51383.32,
+      "silhouette_score": 0.4816
+    },
+    {
+      "k": 3,
+      "inertia": 18835.34,
+      "silhouette_score": 0.6781
+    },
+    {
+      "k": 4,
+      "inertia": 3351.88,
+      "silhouette_score": 0.8055
+    },
+    {
+      "k": 5,
+      "inertia": 3162.86,
+      "silhouette_score": 0.6589
+    },
+    {
+      "k": 6,
+      "inertia": 3004.33,
+      "silhouette_score": 0.4939
+    }
+  ],
+  "optimal_k_by_silhouette": 4,
+  "minibatch_comparison": {
+    "samples": 50000,
+    "standard_kmeans_time_sec": 0.42,
+    "minibatch_kmeans_time_sec": 0.12,
+    "speedup_factor": "3.5x",
+    "inertia_difference_pct": "<0.1%"
+  },
+  "hierarchical_linkages": [
+    {
+      "linkage_method": "Single",
+      "cophenetic_correlation": 0.9823,
+      "behavior": "Chaining / sensitive"
+    },
+    {
+      "linkage_method": "Complete",
+      "cophenetic_correlation": 0.9822,
+      "behavior": "Spherical / compact"
+    },
+    {
+      "linkage_method": "Average",
+      "cophenetic_correlation": 0.983,
+      "behavior": "Balanced"
+    },
+    {
+      "linkage_method": "Ward",
+      "cophenetic_correlation": 0.982,
+      "behavior": "Spherical / compact"
+    }
+  ],
+  "dbscan": {
+    "eps": 0.2,
+    "min_samples": 5,
+    "clusters_discovered": 2,
+    "noise_anomalies_detected": 1,
+    "noise_pct": 0.2,
+    "handles_non_convex": true
+  },
+  "pca_standardization_pitfall": {
+    "unstandardized_pc1_variance_pct": 100.0,
+    "unstandardized_pc2_variance_pct": 0.0,
+    "standardized_pc1_variance_pct": 38.0,
+    "standardized_pc2_variance_pct": 31.41,
+    "standardized_pc3_variance_pct": 30.59,
+    "pitfall_warning": "Unstandardized PCA is dominated 100% by high-magnitude arbitrary units!"
+  },
+  "manifold_visualization": {
+    "tsne_axiom": "Inter-cluster distances in t-SNE / UMAP are non-metric; global geometry is uncalibrated.",
+    "perplexity_default": 30.0
+  },
+  "anomaly_detection": {
+    "total_true_outliers": 50,
+    "isolation_forest_detected": 50,
+    "isolation_forest_pct": 100.0,
+    "one_class_svm_detected": 43,
+    "one_class_svm_pct": 86.0,
+    "reconstruction_error_detected": 43,
+    "reconstruction_error_pct": 86.0
+  },
+  "downstream_cluster_features": {
+    "baseline_accuracy": 0.68,
+    "augmented_accuracy": 0.7422,
+    "accuracy_gain_pct": 6.22
+  }
+}

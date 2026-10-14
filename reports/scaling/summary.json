@@ -1,0 +1,70 @@
+{
+  "before_after_sample_row": {
+    "raw": {
+      "Temp": 22.0,
+      "Humid (%)": 95.0,
+      "Light (Fux)": 7.359,
+      "CO2 (pmm)": 361.0
+    },
+    "minmax_scaled": {
+      "Temp": 0.167,
+      "Humid (%)": 1.0,
+      "Light (Fux)": 0.012,
+      "CO2 (pmm)": 0.745
+    },
+    "standard_scaled": {
+      "Temp": -1.432,
+      "Humid (%)": 0.536,
+      "Light (Fux)": -0.358,
+      "CO2 (pmm)": 0.591
+    },
+    "robust_scaled": {
+      "Temp": -1.0,
+      "Humid (%)": 0.0,
+      "Light (Fux)": -0.934,
+      "CO2 (pmm)": 0.411
+    }
+  },
+  "scaler_comparison": {
+    "Min-Max Scaler": {
+      "output_range": "[0, 1] fixed",
+      "uses": "min, max",
+      "outlier_sensitivity": "High",
+      "best_for": "Bounded inputs, neural networks"
+    },
+    "Standard Scaler": {
+      "output_range": "Unbounded, mean 0",
+      "uses": "mean, std dev",
+      "outlier_sensitivity": "Moderate",
+      "best_for": "Linear/distance-based models"
+    },
+    "Robust Scaler": {
+      "output_range": "Unbounded, median 0",
+      "uses": "median, IQR",
+      "outlier_sensitivity": "Low",
+      "best_for": "Data with real outliers"
+    }
+  },
+  "knn_scaling_experiment": {
+    "model": "KNN (k=7)",
+    "accuracy_unscaled": 0.9852,
+    "accuracy_standardized": 0.9908,
+    "accuracy_gain_pts": 0.55
+  },
+  "scale_sensitivity_by_model": {
+    "scaling_matters": [
+      "KNN",
+      "K-Means / clustering",
+      "SVM",
+      "Logistic & Linear Regression",
+      "PCA",
+      "Neural networks"
+    ],
+    "scale_invariant": [
+      "Decision Trees",
+      "Random Forest",
+      "Gradient Boosting (XGBoost, LightGBM)",
+      "Naive Bayes (usually)"
+    ]
+  }
+}

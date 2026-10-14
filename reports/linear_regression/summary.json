@@ -1,0 +1,54 @@
+{
+  "target_variable": "Storage Temperature (Temp in \u00b0C)",
+  "model_type": "Ordinary Least Squares (OLS) Linear Regression",
+  "sample_counts": {
+    "training_samples": 5680,
+    "validation_samples": 1217,
+    "test_samples": 1218
+  },
+  "intercept_beta_0": 18.3967,
+  "coefficients": [
+    {
+      "Feature": "Fruit_Orange",
+      "Coefficient": -2.2387
+    },
+    {
+      "Feature": "Fruit_Pineapple",
+      "Coefficient": -1.3542
+    },
+    {
+      "Feature": "Fruit_Tomato",
+      "Coefficient": -1.1356
+    },
+    {
+      "Feature": "Humid (%)",
+      "Coefficient": 0.0533
+    },
+    {
+      "Feature": "Light (Fux)",
+      "Coefficient": 0.0091
+    },
+    {
+      "Feature": "CO2 (pmm)",
+      "Coefficient": 0.0048
+    }
+  ],
+  "metrics": {
+    "train_r2": 0.4809,
+    "adjusted_r2_train": 0.4804,
+    "val_r2": 0.4653,
+    "adjusted_r2_val": 0.4626,
+    "test_r2": 0.4893,
+    "adjusted_r2_test": 0.4868,
+    "test_mse": 0.8159,
+    "test_rmse": 0.9033,
+    "test_mae": 0.7582
+  },
+  "assumptions_analysis": {
+    "linearity": "Moderately linear correlation between temperature, humidity, and fruit variety respiration.",
+    "normality_of_residuals": "Residuals centered at 0.0251\u00b0C with standard deviation 0.9029\u00b0C.",
+    "homoscedasticity": "Residuals remain consistently bounded within \u00b12.5\u00b0C across the operational temperature range [21\u00b0C, 27\u00b0C].",
+    "multicollinearity": "One-hot encoding uses drop_first=True to eliminate the dummy variable trap."
+  },
+  "viva_takeaway": "Linear regression models continuous environmental relationships using Ordinary Least Squares. The model explains 48.9% of the variance in cold-storage temperature with an average absolute error of only 0.76\u00b0C. Unlike Decision Trees which make orthogonal step splits, Linear Regression fits a smooth hyper-plane."
+}

@@ -1,0 +1,166 @@
+{
+  "case_study_table": [
+    {
+      "Student": "S01",
+      "CGPA": 8.5,
+      "Coding": 85,
+      "TruePlaced": 1,
+      "PredProb": 0.88,
+      "PredPlaced": 1,
+      "TrueSalary": 85.0,
+      "PredSalary": 82.0,
+      "AbsError": 3.0,
+      "SqError": 9.0
+    },
+    {
+      "Student": "S02",
+      "CGPA": 7.2,
+      "Coding": 65,
+      "TruePlaced": 0,
+      "PredProb": 0.25,
+      "PredPlaced": 0,
+      "TrueSalary": 0.0,
+      "PredSalary": 0.0,
+      "AbsError": 0.0,
+      "SqError": 0.0
+    },
+    {
+      "Student": "S03",
+      "CGPA": 9.1,
+      "Coding": 92,
+      "TruePlaced": 1,
+      "PredProb": 0.95,
+      "PredPlaced": 1,
+      "TrueSalary": 110.0,
+      "PredSalary": 105.0,
+      "AbsError": 5.0,
+      "SqError": 25.0
+    },
+    {
+      "Student": "S04",
+      "CGPA": 6.8,
+      "Coding": 58,
+      "TruePlaced": 0,
+      "PredProb": 0.15,
+      "PredPlaced": 0,
+      "TrueSalary": 0.0,
+      "PredSalary": 0.0,
+      "AbsError": 0.0,
+      "SqError": 0.0
+    },
+    {
+      "Student": "S05",
+      "CGPA": 8.0,
+      "Coding": 72,
+      "TruePlaced": 1,
+      "PredProb": 0.72,
+      "PredPlaced": 1,
+      "TrueSalary": 75.0,
+      "PredSalary": 70.0,
+      "AbsError": 5.0,
+      "SqError": 25.0
+    },
+    {
+      "Student": "S06",
+      "CGPA": 7.0,
+      "Coding": 61,
+      "TruePlaced": 0,
+      "PredProb": 0.4,
+      "PredPlaced": 0,
+      "TrueSalary": 0.0,
+      "PredSalary": 0.0,
+      "AbsError": 0.0,
+      "SqError": 0.0
+    },
+    {
+      "Student": "S07",
+      "CGPA": 8.8,
+      "Coding": 89,
+      "TruePlaced": 1,
+      "PredProb": 0.91,
+      "PredPlaced": 1,
+      "TrueSalary": 95.0,
+      "PredSalary": 90.0,
+      "AbsError": 5.0,
+      "SqError": 25.0
+    },
+    {
+      "Student": "S08",
+      "CGPA": 7.5,
+      "Coding": 68,
+      "TruePlaced": 0,
+      "PredProb": 0.6,
+      "PredPlaced": 1,
+      "TrueSalary": 0.0,
+      "PredSalary": 45.0,
+      "AbsError": 45.0,
+      "SqError": 2025.0
+    },
+    {
+      "Student": "S09",
+      "CGPA": 8.2,
+      "Coding": 80,
+      "TruePlaced": 1,
+      "PredProb": 0.82,
+      "PredPlaced": 1,
+      "TrueSalary": 80.0,
+      "PredSalary": 78.0,
+      "AbsError": 2.0,
+      "SqError": 4.0
+    },
+    {
+      "Student": "S10",
+      "CGPA": 6.9,
+      "Coding": 59,
+      "TruePlaced": 0,
+      "PredProb": 0.2,
+      "PredPlaced": 0,
+      "TrueSalary": 0.0,
+      "PredSalary": 0.0,
+      "AbsError": 0.0,
+      "SqError": 0.0
+    }
+  ],
+  "classification": {
+    "confusion_matrix": {
+      "TP": 5,
+      "FP": 1,
+      "TN": 4,
+      "FN": 0
+    },
+    "accuracy": 0.9,
+    "precision": 0.8333,
+    "recall": 1.0,
+    "specificity": 0.8,
+    "f1_score": 0.9091,
+    "f05_score": 0.8621,
+    "f2_score": 0.9615,
+    "accuracy_paradox_demo": {
+      "dummy_majority_accuracy": 0.5,
+      "dummy_recall": 0.0,
+      "note": "On balanced 50% data, dummy achieves 50%. On 99:1 imbalance, dummy achieves 99% accuracy but 0% recall!"
+    }
+  },
+  "regression": {
+    "sae_k": 65.0,
+    "sse_k2": 2113.0,
+    "mae_k": 6.5,
+    "mse_k2": 211.3,
+    "rmse_k": 14.54,
+    "rmse_to_mae_ratio": 2.24,
+    "r2_score": 0.8973,
+    "huber_intercept": -0.0,
+    "huber_coef": 1.0476,
+    "outlier_analysis": "S08 produces a $45k error. In MAE, it contributes 45/10 = $4.5k. In MSE, it contributes 45^2/10 = 202.5k^2, causing RMSE to jump to $14.54k (2.24x MAE)."
+  },
+  "quiz": [
+    {
+      "q": "Why does MAE optimize for the conditional median while MSE optimizes for the mean?",
+      "a": "MAE uses an L1 linear penalty whose derivative is constant (+/- 1), so the zero-gradient point occurs at the median. MSE uses an L2 quadratic penalty whose derivative is linear, so the zero-gradient point occurs at the expected mean."
+    },
+    {
+      "q": "How does Huber loss transition between MSE and MAE?",
+      "a": "It uses MSE (quadratic 0.5*e^2) for errors |e| <= delta for smooth gradients, and MAE (linear delta*(|e|-0.5*delta)) for errors |e| > delta to bound outlier gradients."
+    }
+  ]
+}

@@ -1,0 +1,162 @@
+{
+  "dataset": [
+    {
+      "Student": "S01",
+      "CGPA": 8.5,
+      "Aptitude": 82,
+      "Coding": 85,
+      "Communication": 80,
+      "Internship": 2,
+      "Projects": 3,
+      "Placed": 1
+    },
+    {
+      "Student": "S02",
+      "CGPA": 7.2,
+      "Aptitude": 65,
+      "Coding": 60,
+      "Communication": 70,
+      "Internship": 0,
+      "Projects": 1,
+      "Placed": 0
+    },
+    {
+      "Student": "S03",
+      "CGPA": 9.1,
+      "Aptitude": 90,
+      "Coding": 92,
+      "Communication": 85,
+      "Internship": 3,
+      "Projects": 4,
+      "Placed": 1
+    },
+    {
+      "Student": "S04",
+      "CGPA": 6.8,
+      "Aptitude": 55,
+      "Coding": 50,
+      "Communication": 65,
+      "Internship": 0,
+      "Projects": 1,
+      "Placed": 0
+    },
+    {
+      "Student": "S05",
+      "CGPA": 8.0,
+      "Aptitude": 75,
+      "Coding": 78,
+      "Communication": 75,
+      "Internship": 1,
+      "Projects": 2,
+      "Placed": 1
+    },
+    {
+      "Student": "S06",
+      "CGPA": 7.0,
+      "Aptitude": 60,
+      "Coding": 58,
+      "Communication": 68,
+      "Internship": 0,
+      "Projects": 1,
+      "Placed": 0
+    },
+    {
+      "Student": "S07",
+      "CGPA": 8.8,
+      "Aptitude": 88,
+      "Coding": 89,
+      "Communication": 82,
+      "Internship": 2,
+      "Projects": 3,
+      "Placed": 1
+    },
+    {
+      "Student": "S08",
+      "CGPA": 7.5,
+      "Aptitude": 70,
+      "Coding": 68,
+      "Communication": 72,
+      "Internship": 1,
+      "Projects": 2,
+      "Placed": 0
+    },
+    {
+      "Student": "S09",
+      "CGPA": 8.2,
+      "Aptitude": 80,
+      "Coding": 82,
+      "Communication": 78,
+      "Internship": 2,
+      "Projects": 3,
+      "Placed": 1
+    },
+    {
+      "Student": "S10",
+      "CGPA": 6.9,
+      "Aptitude": 58,
+      "Coding": 55,
+      "Communication": 62,
+      "Internship": 0,
+      "Projects": 1,
+      "Placed": 0
+    }
+  ],
+  "dev_students": [
+    "S01",
+    "S02",
+    "S03",
+    "S04",
+    "S05",
+    "S06",
+    "S07",
+    "S08"
+  ],
+  "test_students": [
+    "S09",
+    "S10"
+  ],
+  "cv_scores_4fold": [
+    0.5,
+    1.0,
+    1.0,
+    1.0
+  ],
+  "mean_cv_accuracy": 0.875,
+  "test_accuracy": 1.0,
+  "test_predictions": [
+    {
+      "student": "S09",
+      "actual": 1,
+      "prob": 0.858,
+      "pred": 1
+    },
+    {
+      "student": "S10",
+      "actual": 0,
+      "prob": 0.033,
+      "pred": 0
+    }
+  ],
+  "learned_weights": {
+    "CGPA": 0.544,
+    "Aptitude": 0.465,
+    "Coding": 0.582,
+    "Communication": 0.47,
+    "Internship": 0.335,
+    "Projects": 0.335
+  },
+  "quiz": [
+    {
+      "q": "Why is validation score optimistically biased?",
+      "a": "Because hyperparameter decisions were made to explicitly maximize it."
+    },
+    {
+      "q": "What happens if you run StandardScaler before train_test_split?",
+      "a": "Data Leakage! Test statistics corrupt the training distribution."
+    },
+    {
+      "q": "When should you use Stratified K-Fold over Standard K-Fold?",
+      "a": "For imbalanced classification to prevent class-starved folds."
+    }
+  ]
+}
